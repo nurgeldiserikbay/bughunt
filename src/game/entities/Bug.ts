@@ -1,14 +1,16 @@
-import { AnimatedSprite, Spritesheet } from 'pixi.js'
+import { AnimatedSprite, Container, Spritesheet } from 'pixi.js'
 
 import { BUGS } from '../consts'
 
 import Game from '../Game'
 
 import { Food } from './Food'
+import { HealthBar } from './HealthBar'
 
 const SIZE = 100
 
-export class Bug extends AnimatedSprite {
+export class Bug extends Container {
+	sprite: AnimatedSprite
 	name: string
 	game: Game
 	health: number
@@ -25,14 +27,17 @@ export class Bug extends AnimatedSprite {
 	spritesheets: Spritesheet
 	state: string
 	dieSound: string
+	healthBar: HealthBar
 	timerDie?: ReturnType<typeof setTimeout>
 	timer?: ReturnType<typeof setInterval>
 
 	constructor(optName: string, game: Game) {
-		super(game.spritesheets[optName].animations.walk)
-		this.width = SIZE
-		this.height = SIZE
-		this.anchor.set(0.5)
+		super()
+		this.sprite = new AnimatedSprite(game.spritesheets[optName].animations.walk)
+		this.sprite.width = SIZE
+		this.sprite.height = SIZE
+		this.sprite.anchor.set(0.5)
+		this.addChild(this.sprite)
 		this.name = String(Math.random())
 		this.game = game
 		this.waitTime = 0
@@ -42,7 +47,7 @@ export class Bug extends AnimatedSprite {
 		this.state = 'walk'
 
 		const opt = BUGS[optName]
-		this.animationSpeed = BUGS[optName].animationSpeed
+		this.sprite.animationSpeed = BUGS[optName].animationSpeed
 		this.health = opt.health
 		this.appetite = opt.appetite
 		this.speed = opt.speed / 2
@@ -54,7 +59,16 @@ export class Bug extends AnimatedSprite {
 		this.wanderAngle = Math.random() * Math.PI * 2
 		this.lastMouseCheck = 0
 
-		this.play()
+		this.healthBar = new HealthBar({
+			width: SIZE * 0.8,
+			height: 5,
+			health: this.health,
+			color: '#fc53ee',
+			y: -70,
+		})
+		this.addChild(this.healthBar)
+
+		this.sprite.play()
 		this.setPosition()
 
 		game.bugs.push(this)
@@ -136,7 +150,7 @@ export class Bug extends AnimatedSprite {
 			this.x += (dx / dist) * this.speed
 			this.y += (dy / dist) * this.speed
 			const angle = Math.atan2(dy, dx)
-			this.rotation = angle + Math.PI / 2
+			this.sprite.rotation = angle + Math.PI / 2
 			if (this.timer !== undefined) this.stopEating()
 			this.changeState('walk')
 		} else if (!this.timer && target.health > 0) {
@@ -161,7 +175,7 @@ export class Bug extends AnimatedSprite {
 		this.wanderAngle += (Math.random() - 0.5) * 0.2
 		this.x += Math.cos(this.wanderAngle) * this.speed
 		this.y += Math.sin(this.wanderAngle) * this.speed
-		this.rotation = this.wanderAngle + Math.PI / 2
+		this.sprite.rotation = this.wanderAngle + Math.PI / 2
 
 		if (this.x < 0) this.x = 0
 		if (this.x > this.game.area.grid.width) this.x = this.game.area.grid.width
@@ -184,28 +198,28 @@ export class Bug extends AnimatedSprite {
 		if (this.state === 'dead') return
 
 		if (this.state !== 'idle' && state === 'idle') {
-			this.textures = this.spritesheets.animations.idle
+			this.sprite.textures = this.spritesheets.animations.idle
 		} else if (this.state !== 'walk' && state === 'walk') {
-			this.textures = this.spritesheets.animations.walk
+			this.sprite.textures = this.spritesheets.animations.walk
 		} else if (state === 'dead') {
-			this.textures = this.spritesheets.animations.dead
+			// this.sprite.textures = this.spritesheets.animations.dead
 		}
-		this.play()
+		this.sprite.play()
 		this.state = state
 	}
 
 	runAway() {
 		const threat = this.game.scene.app.renderer.events.pointer
 		const angle = Math.atan2(this.y - threat.y, this.x - threat.x)
-		this.rotation = angle + Math.PI / 2
+		this.sprite.rotation = angle + Math.PI / 2
 		this.x += Math.cos(angle) * this.speed * 3
 		this.y += Math.sin(angle) * this.speed * 3
-		this.animationSpeed *= 3
+		this.sprite.animationSpeed *= 3
 		if (!this.isScared) {
 			this.changeState('walk')
 			setTimeout(() => {
 				this.isScared = false
-				this.animationSpeed /= 3
+				this.sprite.animationSpeed /= 3
 			}, 1000)
 		}
 		this.isScared = true
@@ -213,7 +227,10 @@ export class Bug extends AnimatedSprite {
 
 	hit(damage: number) {
 		this.health -= damage
-		if (this.health < 0) this.die()
+		this.healthBar.update(this.health)
+		if (this.health < 0) {
+			this.die()
+		}
 		else {
 			this.runAway()
 		}
@@ -224,15 +241,16 @@ export class Bug extends AnimatedSprite {
 		this.changeState('dead')
 		this.stopEating()
 		this.game.bugDie(this.appetite)
+		this.game.createScorePopup(this.x, this.y, this.appetite)
 		this.game.bugCalculate()
 
 		this.game.controls.play(this.dieSound)
 
-		this.timerDie = setTimeout(() => {
-			try {
+		// this.timerDie = setTimeout(() => {
+		// 	try {
 				this.remove()
-			} catch (error) {}
-		}, 5000)
+		// 	} catch (error) {}
+		// }, 5000)
 	}
 
 	remove() {
@@ -249,16 +267,16 @@ export class Bug extends AnimatedSprite {
 	setPosition() {
 		if (Math.random() > 0.5) {
 			if (Math.random() > 0.5) {
-				this.y = this.height / -2
+				this.y = this.sprite.height / -2
 			} else {
-				this.y = this.game.area.grid.height + this.height / 2
+				this.y = this.game.area.grid.height + this.sprite.height / 2
 			}
 			this.x = Math.random() * this.game.area.grid.width
 		} else {
 			if (Math.random() > 0.5) {
-				this.x = this.width / -2
+				this.x = this.sprite.width / -2
 			} else {
-				this.x = this.game.area.grid.width + this.width / 2
+				this.x = this.game.area.grid.width + this.sprite.width / 2
 			}
 			this.y = Math.random() * this.game.area.grid.height
 		}

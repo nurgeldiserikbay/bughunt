@@ -3,14 +3,14 @@ import * as PIXI from 'pixi.js'
 import { ISceneOpt, ITicker } from './interfaces'
 
 export default class Scene {
-	private _canvas: HTMLCanvasElement
 	private _app: PIXI.Application
 	private _updates: Map<string, (ticker: ITicker) => void>
 
+	canvas: HTMLCanvasElement
 	app: PIXI.Application
 
 	constructor({ canvas }: ISceneOpt) {
-		this._canvas = canvas
+		this.canvas = canvas
 		this._app = new PIXI.Application()
 		this._updates = new Map()
 
@@ -18,15 +18,17 @@ export default class Scene {
 	}
 
 	async init() {
-		const scale = window.devicePixelRatio
-		this._canvas.width = Math.floor(this._canvas.clientWidth * scale)
-		this._canvas.height = Math.floor(this._canvas.clientHeight * scale)
+		this.canvas.width = this.canvas.clientWidth
+		this.canvas.height = this.canvas.clientHeight
 
 		await this._app.init({
 			backgroundAlpha: 0,
-			canvas: this._canvas,
-			width: this._canvas.width,
-			height: this._canvas.height,
+			canvas: this.canvas,
+			width: this.canvas.width,
+			height: this.canvas.height,
+			// resolution: window.devicePixelRatio || 1,
+			autoDensity: true,
+			antialias: true,
 		})
 	}
 

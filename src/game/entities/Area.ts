@@ -69,11 +69,11 @@ export class Area {
 		this.bgMask.height = option.height
 	}
 
-	addChild(child: Sprite) {
+	addChild(child: Sprite | Container) {
 		this.grid.addChild(child)
 	}
 
-	removeChild(child: Sprite) {
+	removeChild(child: Sprite | Container) {
 		this.grid.removeChild(child)
 	}
 

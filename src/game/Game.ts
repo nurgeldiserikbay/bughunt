@@ -1,4 +1,4 @@
-import { Assets, Spritesheet, Texture } from 'pixi.js'
+import { Assets, Spritesheet, Texture, TextStyle, Text, Ticker } from 'pixi.js'
 
 import { getCloseValue } from './helpers'
 
@@ -22,13 +22,12 @@ export default class Game {
 	}
 	levelOption?: ILevel
 	controls: IGameCallbacks
-
+	textStyle: TextStyle
 	area: Area
 	foods: Food[]
 	bugs: Bug[]
 	timeOvered: boolean
 	swatter?: FlySwatter
-
 	stats: {
 		allDiedBugs: number
 		diedBugs: number
@@ -41,6 +40,12 @@ export default class Game {
 		this.spritesheets = {}
 		this.timerIds = {}
 		this.controls = opt
+		this.textStyle = new TextStyle({
+			fontFamily: 'Arial',
+			fontSize: 32,
+			fill: 0xffffff,
+			stroke: 0x000000,
+		})
 
 		this.area = new Area(this.scene)
 		this.foods = []
@@ -57,6 +62,12 @@ export default class Game {
 	async init() {
 		this.area.init()
 		this.scene.addElem(this.area.grid)
+		// this.area.grid.scale.set(
+		// 	Math.min(
+		// 		this.scene.canvas.clientWidth / this.scene.canvas.width,
+		// 		this.scene.canvas.clientHeight / this.scene.canvas.height
+		// 	)
+		// )
 		this.scene.addUpdate('area', () => {
 			this.area.updateUI()
 		})
@@ -82,6 +93,36 @@ export default class Game {
 		this.foods.forEach((food) => food.die())
 		this.timeOvered = false
 		this.bugs.forEach((bug) => bug.remove())
+	}
+
+	createScorePopup(x: number, y: number, points: number) {
+		const scoreText = new Text({
+			text: `+${points}`,
+			style: this.textStyle,
+		})
+		scoreText.zIndex = 1000
+
+		scoreText.anchor.set(0.5)
+		scoreText.x = x
+		scoreText.y = y
+
+		this.area.grid.addChild(scoreText)
+
+		let alphaDecay = 0.01
+		let riseSpeed = 1
+
+		const ticker = new Ticker()
+		ticker.add(() => {
+			scoreText.y -= riseSpeed
+			scoreText.alpha -= alphaDecay
+
+			if (scoreText.alpha <= 0) {
+				ticker.stop()
+				this.area.grid.removeChild(scoreText)
+			}
+		})
+
+		ticker.start()
 	}
 
 	createFood(round: number) {
@@ -163,7 +204,6 @@ export default class Game {
 		this.stats.diedBugs += 1
 		this.stats.allDiedBugs += 1
 		this.stats.score += value
-
 		this.bugCalculate()
 		this.controls.drawScore('diedBugs', this.stats.diedBugs)
 		this.controls.drawScore('allDiedBugs', this.stats.allDiedBugs)
@@ -180,7 +220,7 @@ export default class Game {
 		if (!this.levelOption?.area) return
 		const area = AREAS[this.levelOption.area]
 		if (!area) return
-		const dim = Math.max(this.scene.app.canvas.width, this.scene.app.canvas.height)
+		const dim = Math.max(this.scene.canvas.width, this.scene.canvas.height)
 		this.area.setArea({
 			...area,
 			width: dim * 1.2,

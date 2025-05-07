@@ -59,8 +59,8 @@ export const AREAS: IAreas = {
 	garden: {
 		texture: '/img/areas/garden.png',
 		textureMask: '/img/areas/garden-mask.png',
-		width: 800,
-		height: 800,
+		width: 400,
+		height: 400,
 	},
 	// wood1: {
 	// 	texture: '/img/areas/wood1.png',

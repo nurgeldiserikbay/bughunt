@@ -4,6 +4,8 @@ import { FOODS } from '../consts'
 
 import Game from '../Game'
 
+import { HealthBar } from './HealthBar'
+
 const SIZE = 120
 
 export class Food extends AnimatedSprite {
@@ -14,6 +16,7 @@ export class Food extends AnimatedSprite {
 	spritesheets: Spritesheet
 	min: { x: number; y: number }
 	delta: { x: number; y: number }
+	healthBar: HealthBar
 
 	constructor(optName: string, game: Game) {
 		super(game.spritesheets[optName].animations.eat)
@@ -28,6 +31,15 @@ export class Food extends AnimatedSprite {
 		this.health = opt.health
 		this.attractiveness = opt.attractiveness
 
+		this.healthBar = new HealthBar({
+			width: SIZE * 3.5,
+			height: 10,
+			health: this.health,
+			color: '#fc53ee',
+		})
+
+		this.addChild(this.healthBar)
+
 		game.foods.push(this)
 		game.area.addChild(this)
 
@@ -40,24 +52,27 @@ export class Food extends AnimatedSprite {
 			x: this.game.area.grid.width * 0.6,
 			y: this.game.area.grid.height * 0.6,
 		}
+
 		this.setPosition()
 	}
 
 	damage(damage: number) {
 		this.health -= damage
 
-		if (this.health < 0) this.die()
+		if (this.health < 0) {
+			this.die()
+		}
 		else if (this.health < 0.3 * FOODS[this.name].health) {
 			this.currentFrame = 2
 			this.width = SIZE * 0.3
 			this.height = SIZE * 0.3
-		}
-		else if (this.health < 0.6 * FOODS[this.name].health) {
+		} else if (this.health < 0.6 * FOODS[this.name].health) {
 			this.currentFrame = 1
 			this.width = SIZE * 0.6
 			this.height = SIZE * 0.6
 		}
 
+		this.healthBar.update(this.health)
 		this.game.foodCalculate()
 	}
 

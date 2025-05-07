@@ -62,7 +62,9 @@ export class FlySwatter extends AnimatedSprite {
 				bug.hit(power)
 			}
 		})
-		this.game.controls.play(AUDIO_LIST[Math.floor(AUDIO_LIST.length * Math.random())])
+		this.game.controls.play(
+			AUDIO_LIST[Math.floor(AUDIO_LIST.length * Math.random())]
+		)
 		this.stop()
 		this.timer = setTimeout(() => {
 			this.visible = false

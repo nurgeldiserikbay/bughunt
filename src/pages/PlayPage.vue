@@ -156,10 +156,10 @@ function clearTimers() {
 				<img src="@/assets/img/__red_beetle_idle.png" alt="" />
 				<div>{{ score.bugs }}</div>
 			</div>
-			<div class="page__bugs-item">
+			<!-- <div class="page__bugs-item">
 				<img src="@/assets/img/__red_beetle_dead.png" alt="" />
 				<div>{{ score.diedBugs }}</div>
-			</div>
+			</div> -->
 		</div>
 
 		<ResultTable
