@@ -1,323 +1,277 @@
-import { Texture } from 'pixi.js'
-
-import ant_black from './bugs-sprites-frames/ant_black'
-import ant_red from './bugs-sprites-frames/ant_red'
-import beetle_black from './bugs-sprites-frames/beetle_black'
-import beetle_blue from './bugs-sprites-frames/beetle_blue'
-import beetle_green from './bugs-sprites-frames/beetle_green'
-import beetle_red from './bugs-sprites-frames/beetle_red'
-import beetle_yellow from './bugs-sprites-frames/beetle_yellow'
-import cockroach from './bugs-sprites-frames/cockroach'
-import ladybird_black from './bugs-sprites-frames/ladybird_black'
-import ladybird_red from './bugs-sprites-frames/ladybird_red'
-import ladybird_yellow from './bugs-sprites-frames/ladybird_yellow'
+import ant_black from './sprites/bugs/ant_black'
+import ant_red from './sprites/bugs/ant_red'
+import beetle_black from './sprites/bugs/beetle_black'
+import beetle_blue from './sprites/bugs/beetle_blue'
+import beetle_green from './sprites/bugs/beetle_green'
+import beetle_red from './sprites/bugs/beetle_red'
+import beetle_yellow from './sprites/bugs/beetle_yellow'
+import cockroach from './sprites/bugs/cockroach'
+import ladybird_black from './sprites/bugs/ladybird_black'
+import ladybird_red from './sprites/bugs/ladybird_red'
+import ladybird_yellow from './sprites/bugs/ladybird_yellow'
 
 // import blue from './swat-sprites-frames/blue'
-import purple from './swat-sprites-frames/purple'
+import purple from './sprites/swater/purple'
 // import red from './swat-sprites-frames/red'
 // import yellow from './swat-sprites-frames/yellow'
 
-import sugar from './food/sugar'
+import apple from './sprites/food/apple'
+import banana from './sprites/food/banana'
+import cookie from './sprites/food/cookie'
+import grape from './sprites/food/grape'
+import orange from './sprites/food/orange'
 
-export interface ISpritesheet {
-	frames: {
-		[key: string]: {
-			frame: { x: number; y: number; w: number; h: number }
-			sourceSize: { w: number; h: number }
-			spriteSourceSize: { x: number; y: number; w: number; h: number }
-		}
-	}
-	meta: {
-		image: string
-		scale: string
-		size: { w: number; h: number }
-	}
-	animations: {
-		[key: string]: string[]
-	}
-}
+import { IAreas, IBugs, IFoods, ILevels, ISwatters } from './types'
 
-export interface IArea {
-	texture: string
-	textureMask: string
-	width: number
-	height: number
-}
-
-export interface I_AreaOpt {
-	width: number
-	height: number
-	texture: Texture
-	textureMask: Texture
-}
-
-export interface IAreas {
-	[key: string]: IArea
-}
+import leaf_spritesheet from './sprites/additionals/leaf_spritesheet'
+import leaf_flip_spritesheet from './sprites/additionals/leaf_flip_spritesheet'
 
 export const AREAS: IAreas = {
-	garden: {
-		texture: '/img/areas/garden.png',
-		textureMask: '/img/areas/garden-mask.png',
+	garden1: {
+		texture: '/img/areas/garden-1.png',
+		animationSpritesheet: leaf_spritesheet,
+		animationSpeed: 0.1,
+		animationWidth: 30,
+		animationHeight: 30,
+		animationMoveSpeed: 0.2,
+		// textureMask: '/img/areas/garden-mask.png',
 		width: 400,
 		height: 400,
 	},
-	// wood1: {
-	// 	texture: '/img/areas/wood1.png',
-	// 	textureMask: '/img/areas/garden-mask.png',
-	// 	width: 500,
-	// 	height: 500,
-	// },
-	// wood2: {
-	// 	texture: '/img/areas/wood2.png',
-	// 	textureMask: '/img/areas/garden-mask.png',
-	// 	width: 500,
-	// 	height: 500,
-	// },
-	// wood3: {
-	// 	texture: '/img/areas/wood3.png',
-	// 	textureMask: '/img/areas/garden-mask.png',
-	// 	width: 500,
-	// 	height: 500,
-	// },
-	// wood4: {
-	// 	texture: '/img/areas/wood4.png',
-	// 	textureMask: '/img/areas/garden-mask.png',
-	// 	width: 500,
-	// 	height: 500,
-	// },
-	// grass1: {
-	// 	texture: '/img/areas/grass1.png',
-	// 	textureMask: '/img/areas/garden-mask.png',
-	// 	width: 500,
-	// 	height: 500,
-	// },
-	// grass2: {
-	// 	texture: '/img/areas/grass2.png',
-	// 	textureMask: '/img/areas/garden-mask.png',
-	// 	width: 500,
-	// 	height: 500,
-	// },
-	// grass3: {
-	// 	texture: '/img/areas/grass3.png',
-	// 	textureMask: '/img/areas/garden-mask.png',
-	// 	width: 500,
-	// 	height: 500,
-	// },
-	// grass4: {
-	// 	texture: '/img/areas/grass4.png',
-	// 	textureMask: '/img/areas/garden-mask.png',
-	// 	width: 500,
-	// 	height: 500,
-	// },
-	// stone1: {
-	// 	texture: '/img/areas/stone1.png',
-	// 	textureMask: '/img/areas/garden-mask.png',
-	// 	width: 500,
-	// 	height: 500,
-	// },
-	// stone2: {
-	// 	texture: '/img/areas/stone2.png',
-	// 	textureMask: '/img/areas/garden-mask.png',
-	// 	width: 500,
-	// 	height: 500,
-	// },
-	// stone3: {
-	// 	texture: '/img/areas/stone3.png',
-	// 	textureMask: '/img/areas/garden-mask.png',
-	// 	width: 500,
-	// 	height: 500,
-	// },
-	// stone4: {
-	// 	texture: '/img/areas/stone4.png',
-	// 	textureMask: '/img/areas/garden-mask.png',
-	// 	width: 500,
-	// 	height: 500,
-	// },
-	// garbage1: {
-	// 	texture: '/img/areas/garbage1.png',
-	// 	textureMask: '/img/areas/garden-mask.png',
-	// 	width: 1000,
-	// 	height: 1000,
-	// },
-	// garbage2: {
-	// 	texture: '/img/areas/garbage2.png',
-	// 	textureMask: '/img/areas/garden-mask.png',
-	// 	width: 500,
-	// 	height: 500,
-	// },
-	// garbage3: {
-	// 	texture: '/img/areas/garbage3.png',
-	// 	textureMask: '/img/areas/garden-mask.png',
-	// 	width: 500,
-	// 	height: 500,
-	// },
-	// garbage4: {
-	// 	texture: '/img/areas/garbage4.png',
-	// 	textureMask: '/img/areas/garden-mask.png',
-	// 	width: 500,
-	// 	height: 500,
-	// },
-}
-
-export interface IFood {
-	texture: string
-	data: ISpritesheet
-	health: number
-	attractiveness: number
-}
-
-export interface IFoods {
-	[key: string]: IFood
+	garden2: {
+		texture: '/img/areas/garden-2.png',
+		animationSpritesheet: leaf_flip_spritesheet,
+		animationSpeed: 0.6,
+		animationWidth: 30,
+		animationHeight: 30,
+		animationMoveSpeed: 2.4,
+		// textureMask: '/img/areas/garden-mask.png',
+		width: 400,
+		height: 400,
+	},
+	garden3: {
+		texture: '/img/areas/garden-3.png',
+		animationSpritesheet: leaf_spritesheet,
+		animationSpeed: 0.3,
+		animationWidth: 15,
+		animationHeight: 15,
+		animationMoveSpeed: 1,
+		// textureMask: '/img/areas/garden-mask.png',
+		width: 400,
+		height: 400,
+	},
+	garden4: {
+		texture: '/img/areas/garden-4.png',
+		animationSpritesheet: leaf_spritesheet,
+		animationSpeed: 0.3,
+		animationWidth: 15,
+		animationHeight: 15,
+		animationMoveSpeed: 1,
+		// textureMask: '/img/areas/garden-mask.png',
+		width: 400,
+		height: 400,
+	},
+	garden5: {
+		texture: '/img/areas/garden-5.png',
+		animationSpritesheet: leaf_spritesheet,
+		animationSpeed: 0.3,
+		animationWidth: 15,
+		animationHeight: 15,
+		animationMoveSpeed: 1,
+		// textureMask: '/img/areas/garden-mask.png',
+		width: 400,
+		height: 400,
+	},
+	garden6: {
+		texture: '/img/areas/garden-6.png',
+		animationSpritesheet: leaf_spritesheet,
+		animationSpeed: 0.3,
+		animationWidth: 15,
+		animationHeight: 15,
+		animationMoveSpeed: 1,
+		// textureMask: '/img/areas/garden-mask.png',
+		width: 400,
+		height: 400,
+	},
 }
 
 export const FOODS: IFoods = {
-	sugar: {
-		texture: '/img/foods/sugar.png',
-		data: sugar,
-		health: 300,
+	apple: {
+		texture: '/img/foods/apple.png',
+		data: apple,
+		health: 200,
+		attractiveness: 1,
+	},
+	banana: {
+		texture: '/img/foods/banana.png',
+		data: banana,
+		health: 180,
+		attractiveness: 1,
+	},
+	cookie: {
+		texture: '/img/foods/cookie.png',
+		data: cookie,
+		health: 150,
+		attractiveness: 1,
+	},
+	grape: {
+		texture: '/img/foods/grape.png',
+		data: grape,
+		health: 220,
+		attractiveness: 1,
+	},
+	orange: {
+		texture: '/img/foods/orange.png',
+		data: orange,
+		health: 190,
 		attractiveness: 1,
 	},
 }
 
-export interface IBug {
-	health: number
-	dieSound: string
-	data: ISpritesheet
-	animationSpeed: number
-	appetite: number
-	eatSpeed: number
-	speed: number
-	intelligence: number
-}
-
-export interface IBugs {
-	[key: string]: IBug
-}
-
 export const BUGS: IBugs = {
 	beetle_black: {
+		width: 50,
+		height: 50,
 		dieSound: 'dieAnt',
 		data: beetle_black,
-		health: 80,
-		appetite: 5,
+		health: 60,
+		appetite: 4,
+		score: 2,
+		eatSpeed: 1200,
+		speed: 4,
+		animationSpeed: 0.3,
+		intelligence: 0.5,
+	},
+	beetle_blue: {
+		width: 50,
+		height: 50,
+		dieSound: 'dieBeetle',
+		data: beetle_blue,
+		health: 70,
+		appetite: 6,
+		score: 3,
 		eatSpeed: 1000,
-		speed: 5,
+		speed: 4,
 		animationSpeed: 0.3,
 		intelligence: 0.4,
 	},
-	beetle_blue: {
-		dieSound: 'dieBeetle',
-		data: beetle_blue,
-		health: 80,
-		appetite: 5,
-		eatSpeed: 1000,
-		speed: 5,
-		animationSpeed: 0.3,
-		intelligence: 0.3,
-	},
 	beetle_green: {
+		width: 50,
+		height: 50,
 		dieSound: 'dieBeetle',
 		data: beetle_green,
-		health: 80,
+		health: 65,
 		appetite: 5,
-		eatSpeed: 1000,
-		speed: 5,
+		score: 2,
+		eatSpeed: 1100,
+		speed: 4,
 		animationSpeed: 0.3,
-		intelligence: 0.3,
+		intelligence: 0.45,
 	},
 	beetle_red: {
+		width: 50,
+		height: 50,
 		dieSound: 'dieBeetle',
 		data: beetle_red,
-		health: 80,
-		appetite: 5,
-		eatSpeed: 1000,
-		speed: 5,
+		health: 75,
+		appetite: 7,
+		score: 4,
+		eatSpeed: 900,
+		speed: 4,
 		animationSpeed: 0.3,
-		intelligence: 0.3,
+		intelligence: 0.35,
 	},
 	beetle_yellow: {
-		dieSound: 'dieBeetle',
+		width: 50,
+		height: 50,
+		dieSound: 'beetle_yellow',
 		data: beetle_yellow,
-		health: 80,
-		appetite: 5,
-		eatSpeed: 1000,
-		speed: 5,
+		health: 55,
+		appetite: 3,
+		score: 1,
+		eatSpeed: 1300,
+		speed: 4,
 		animationSpeed: 0.3,
-		intelligence: 0.3,
+		intelligence: 0.6,
 	},
 	ant_black: {
+		width: 40,
+		height: 40,
 		dieSound: 'dieAnt',
 		data: ant_black,
-		health: 60,
-		appetite: 3,
-		eatSpeed: 600,
-		speed: 7,
+		health: 40,
+		appetite: 2,
+		score: 3,
+		eatSpeed: 500,
+		speed: 8,
 		animationSpeed: 0.3,
-		intelligence: 0.3,
+		intelligence: 0.7,
 	},
 	ant_red: {
+		width: 40,
+		height: 40,
 		dieSound: 'dieAnt',
 		data: ant_red,
-		health: 60,
+		health: 45,
 		appetite: 3,
+		score: 4,
 		eatSpeed: 600,
-		speed: 7,
+		speed: 8,
 		animationSpeed: 0.3,
-		intelligence: 0.3,
+		intelligence: 0.65,
 	},
 	cockroach: {
+		width: 50,
+		height: 50,
 		dieSound: 'dieCockroach',
 		data: cockroach,
-		health: 100,
-		appetite: 7,
-		eatSpeed: 500,
-		speed: 10,
+		health: 90,
+		appetite: 8,
+		score: 5,
+		eatSpeed: 400,
+		speed: 12,
 		animationSpeed: 0.3,
-		intelligence: 0.3,
+		intelligence: 0.8,
 	},
 	ladybird_black: {
+		width: 65,
+		height: 65,
 		dieSound: 'dieLadybird',
 		data: ladybird_black,
-		health: 200,
-		appetite: 15,
-		eatSpeed: 1400,
-		speed: 5,
-		animationSpeed: 0.3,
+		health: 260,
+		appetite: 12,
+		score: 6,
+		eatSpeed: 1600,
+		speed: 3,
+		animationSpeed: 1.8,
 		intelligence: 0.3,
 	},
 	ladybird_red: {
+		width: 65,
+		height: 65,
 		dieSound: 'dieLadybird',
 		data: ladybird_red,
-		health: 200,
+		health: 260,
 		appetite: 15,
+		score: 7,
 		eatSpeed: 1400,
-		speed: 5,
-		animationSpeed: 0.3,
-		intelligence: 0.3,
+		speed: 3,
+		animationSpeed: 1.8,
+		intelligence: 0.25,
 	},
 	ladybird_yellow: {
+		width: 65,
+		height: 65,
 		dieSound: 'dieLadybird',
 		data: ladybird_yellow,
-		health: 200,
-		appetite: 15,
-		eatSpeed: 1400,
-		speed: 5,
-		animationSpeed: 0.3,
-		intelligence: 0.3,
+		health: 260,
+		appetite: 13,
+		score: 6,
+		eatSpeed: 1500,
+		speed: 3,
+		animationSpeed: 1.8,
+		intelligence: 0.35,
 	},
-}
-
-export interface ISwatter {
-	texture: string
-	data: ISpritesheet
-	anchor: { x: number; y: number }
-	damage: number
-	cooldown: number
-}
-
-export interface ISwatters {
-	[key: string]: ISwatter
 }
 
 export const FLY_SWATTER: ISwatters = {
@@ -332,7 +286,7 @@ export const FLY_SWATTER: ISwatters = {
 		texture: '/img/swatter/purple.png',
 		anchor: { x: 0.4, y: 0.3 },
 		data: purple,
-		damage: 140,
+		damage: 100,
 		cooldown: 5,
 	},
 	// red: {
@@ -351,240 +305,216 @@ export const FLY_SWATTER: ISwatters = {
 	// },
 }
 
-export interface ILevel {
-	area: string
-	bugsCount: number
-	swatter: string
-	food: string
-	bugs: { [key: number]: string }
-}
-
-export interface ILevels {
-	[key: number]: ILevel
-}
-
 export const LEVEL: ILevels = {
-	2: {
-		area: 'garden',
-		bugsCount: 3,
+	1: {
+		area: 'garden2',
+		bugsCount: 6,
 		swatter: 'purple',
-		food: 'sugar',
 		bugs: {
-			10: 'beetle_yellow',
-			25: 'beetle_black',
-			50: 'beetle_blue',
-			75: 'beetle_yellow',
+			40: 'beetle_yellow',
+			70: 'beetle_black',
+			90: 'beetle_blue',
+			100: 'beetle_red',
+		},
+	},
+	2: {
+		area: 'garden1',
+		bugsCount: 8,
+		swatter: 'purple',
+		bugs: {
+			30: 'beetle_yellow',
+			60: 'beetle_black',
+			85: 'beetle_blue',
 			100: 'beetle_red',
 		},
 	},
 	3: {
-		area: 'garden',
-		bugsCount: 4,
+		area: 'garden2',
+		bugsCount: 10,
 		swatter: 'purple',
-		food: 'sugar',
 		bugs: {
-			10: 'beetle_yellow',
-			25: 'beetle_black',
-			50: 'beetle_blue',
-			75: 'beetle_yellow',
-			85: 'beetle_red',
+			20: 'beetle_yellow',
+			40: 'beetle_black',
+			60: 'beetle_blue',
+			80: 'beetle_red',
 			100: 'ant_black',
 		},
 	},
 	4: {
-		area: 'garden',
-		bugsCount: 4,
+		area: 'garden3',
+		bugsCount: 12,
 		swatter: 'purple',
-		food: 'sugar',
 		bugs: {
-			9: 'beetle_yellow',
-			19: 'beetle_black',
-			28: 'beetle_blue',
-			39: 'beetle_yellow',
-			50: 'beetle_red',
-			75: 'ant_red',
+			15: 'beetle_yellow',
+			30: 'beetle_black',
+			45: 'beetle_blue',
+			60: 'beetle_red',
+			80: 'ant_red',
 			100: 'ant_black',
 		},
 	},
-	6: {
-		area: 'garden',
-		bugsCount: 5,
+	5: {
+		area: 'garden4',
+		bugsCount: 14,
 		swatter: 'purple',
-		food: 'sugar',
 		bugs: {
-			9: 'beetle_yellow',
-			19: 'beetle_black',
-			28: 'beetle_blue',
-			39: 'beetle_yellow',
-			50: 'beetle_red',
-			75: 'ant_red',
-			100: 'ant_black',
-		},
-	},
-	7: {
-		area: 'garden',
-		bugsCount: 5,
-		swatter: 'purple',
-		food: 'sugar',
-		bugs: {
-			9: 'beetle_yellow',
-			19: 'beetle_black',
-			28: 'beetle_blue',
-			39: 'beetle_yellow',
-			50: 'beetle_red',
-			75: 'ant_red',
-			85: 'ant_black',
+			10: 'beetle_yellow',
+			20: 'beetle_black',
+			30: 'beetle_blue',
+			40: 'beetle_red',
+			60: 'ant_red',
+			80: 'ant_black',
 			100: 'cockroach',
 		},
 	},
-	8: {
-		area: 'garden',
-		bugsCount: 6,
+	6: {
+		area: 'garden5',
+		bugsCount: 16,
 		swatter: 'purple',
-		food: 'sugar',
 		bugs: {
-			9: 'beetle_yellow',
-			19: 'beetle_black',
-			28: 'beetle_blue',
-			39: 'beetle_yellow',
-			50: 'beetle_red',
-			75: 'ant_red',
-			85: 'ant_black',
-			95: 'cockroach',
+			8: 'beetle_yellow',
+			16: 'beetle_black',
+			24: 'beetle_blue',
+			32: 'beetle_red',
+			48: 'ant_red',
+			64: 'ant_black',
+			80: 'cockroach',
 			100: 'ladybird_black',
 		},
 	},
-	9: {
-		area: 'garden',
-		bugsCount: 6,
+	7: {
+		area: 'garden6',
+		bugsCount: 18,
 		swatter: 'purple',
-		food: 'sugar',
 		bugs: {
-			9: 'beetle_yellow',
-			16: 'beetle_black',
-			23: 'beetle_blue',
-			30: 'beetle_yellow',
-			37: 'beetle_red',
-			50: 'ant_red',
-			60: 'ant_black',
+			7: 'beetle_yellow',
+			14: 'beetle_black',
+			21: 'beetle_blue',
+			28: 'beetle_red',
+			42: 'ant_red',
+			56: 'ant_black',
 			70: 'cockroach',
-			80: 'ladybird_black',
-			90: 'ladybird_red',
+			85: 'ladybird_black',
 			100: 'ladybird_red',
+		},
+	},
+	8: {
+		area: 'garden1',
+		bugsCount: 18,
+		swatter: 'purple',
+		bugs: {
+			6: 'beetle_yellow',
+			12: 'beetle_black',
+			18: 'beetle_blue',
+			24: 'beetle_red',
+			36: 'ant_red',
+			48: 'ant_black',
+			60: 'cockroach',
+			75: 'ladybird_black',
+			90: 'ladybird_red',
+			100: 'ladybird_yellow',
+		},
+	},
+	9: {
+		area: 'garden2',
+		bugsCount: 18,
+		swatter: 'purple',
+		bugs: {
+			5: 'beetle_yellow',
+			10: 'beetle_black',
+			15: 'beetle_blue',
+			20: 'beetle_red',
+			30: 'ant_red',
+			40: 'ant_black',
+			50: 'cockroach',
+			65: 'ladybird_black',
+			80: 'ladybird_red',
+			100: 'ladybird_yellow',
+		},
+	},
+	10: {
+		area: 'garden3',
+		bugsCount: 18,
+		swatter: 'purple',
+		bugs: {
+			4: 'beetle_yellow',
+			8: 'beetle_black',
+			12: 'beetle_blue',
+			16: 'beetle_red',
+			24: 'ant_red',
+			32: 'ant_black',
+			40: 'cockroach',
+			55: 'ladybird_black',
+			70: 'ladybird_red',
+			100: 'ladybird_yellow',
+		},
+	},
+	11: {
+		area: 'garden4',
+		bugsCount: 22,
+		swatter: 'purple',
+		bugs: {
+			3: 'beetle_yellow',
+			6: 'beetle_black',
+			9: 'beetle_blue',
+			12: 'beetle_red',
+			18: 'ant_red',
+			24: 'ant_black',
+			30: 'cockroach',
+			45: 'ladybird_black',
+			60: 'ladybird_red',
+			100: 'ladybird_yellow',
 		},
 	},
 	12: {
-		area: 'garden',
-		bugsCount: 8,
+		area: 'garden5',
+		bugsCount: 25,
 		swatter: 'purple',
-		food: 'sugar',
 		bugs: {
-			9: 'beetle_yellow',
-			16: 'beetle_black',
-			23: 'beetle_blue',
-			30: 'beetle_yellow',
-			37: 'beetle_red',
-			50: 'ant_red',
-			60: 'ant_black',
-			70: 'cockroach',
-			80: 'ladybird_black',
-			90: 'ladybird_red',
-			100: 'ladybird_red',
+			2: 'beetle_yellow',
+			4: 'beetle_black',
+			6: 'beetle_blue',
+			8: 'beetle_red',
+			12: 'ant_red',
+			16: 'ant_black',
+			20: 'cockroach',
+			35: 'ladybird_black',
+			50: 'ladybird_red',
+			100: 'ladybird_yellow',
 		},
 	},
-	15: {
-		area: 'garden',
-		bugsCount: 10,
+	13: {
+		area: 'garden6',
+		bugsCount: 30,
 		swatter: 'purple',
-		food: 'sugar',
 		bugs: {
-			9: 'beetle_yellow',
-			16: 'beetle_black',
-			23: 'beetle_blue',
-			30: 'beetle_yellow',
-			37: 'beetle_red',
-			50: 'ant_red',
-			60: 'ant_black',
-			70: 'cockroach',
-			80: 'ladybird_black',
-			90: 'ladybird_red',
-			100: 'ladybird_red',
+			2: 'beetle_yellow',
+			4: 'beetle_black',
+			6: 'beetle_blue',
+			8: 'beetle_red',
+			12: 'ant_red',
+			16: 'ant_black',
+			20: 'cockroach',
+			35: 'ladybird_black',
+			50: 'ladybird_red',
+			100: 'ladybird_yellow',
 		},
 	},
-	18: {
-		area: 'garden',
-		bugsCount: 12,
+	14: {
+		area: 'garden6',
+		bugsCount: 40,
 		swatter: 'purple',
-		food: 'sugar',
 		bugs: {
-			9: 'beetle_yellow',
-			16: 'beetle_black',
-			23: 'beetle_blue',
-			30: 'beetle_yellow',
-			37: 'beetle_red',
-			50: 'ant_red',
-			60: 'ant_black',
-			70: 'cockroach',
-			80: 'ladybird_black',
-			90: 'ladybird_red',
-			100: 'ladybird_red',
-		},
-	},
-	21: {
-		area: 'garden',
-		bugsCount: 15,
-		swatter: 'purple',
-		food: 'sugar',
-		bugs: {
-			9: 'beetle_yellow',
-			16: 'beetle_black',
-			23: 'beetle_blue',
-			30: 'beetle_yellow',
-			37: 'beetle_red',
-			50: 'ant_red',
-			60: 'ant_black',
-			70: 'cockroach',
-			80: 'ladybird_black',
-			90: 'ladybird_red',
-			100: 'ladybird_red',
-		},
-	},
-	24: {
-		area: 'garden',
-		bugsCount: 18,
-		swatter: 'purple',
-		food: 'sugar',
-		bugs: {
-			9: 'beetle_yellow',
-			16: 'beetle_black',
-			23: 'beetle_blue',
-			30: 'beetle_yellow',
-			37: 'beetle_red',
-			50: 'ant_red',
-			60: 'ant_black',
-			70: 'cockroach',
-			80: 'ladybird_black',
-			90: 'ladybird_red',
-			100: 'ladybird_red',
-		},
-	},
-	28: {
-		area: 'garden',
-		bugsCount: 50,
-		swatter: 'purple',
-		food: 'sugar',
-		bugs: {
-			9: 'beetle_yellow',
-			16: 'beetle_black',
-			23: 'beetle_blue',
-			30: 'beetle_yellow',
-			37: 'beetle_red',
-			50: 'ant_red',
-			60: 'ant_black',
-			70: 'cockroach',
-			80: 'ladybird_black',
-			90: 'ladybird_red',
-			100: 'ladybird_red',
+			1: 'beetle_yellow',
+			2: 'beetle_black',
+			3: 'beetle_blue',
+			4: 'beetle_red',
+			6: 'ant_red',
+			8: 'ant_black',
+			10: 'cockroach',
+			25: 'ladybird_black',
+			40: 'ladybird_red',
+			100: 'ladybird_yellow',
 		},
 	},
 }

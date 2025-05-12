@@ -10,9 +10,9 @@ export interface IHealthBar {
 
 const DEFAULT_OPTIONS = {
 	width: 120,
-  height: 40,
-	color: '#000000',
-  y: -200,
+	height: 40,
+	color: '#00ff00',
+	y: -200,
 }
 
 export class HealthBar extends Container {
@@ -26,36 +26,39 @@ export class HealthBar extends Container {
 	border: Graphics
 	borderThickness: number
 	borderColor: string
+	round: number
 
 	constructor(options: IHealthBar) {
 		super()
 		this.blockWidth = options.width || DEFAULT_OPTIONS.width
 		this.blockHeight = options.height || DEFAULT_OPTIONS.height
 		this.color = options.color || DEFAULT_OPTIONS.color
-		this.bgColor = '#fcfc53'
+		this.bgColor = '#FF5555'
 		this.health = options?.health
-		this.borderThickness = 5
+		this.borderThickness = 1
 		this.borderColor = '#ffffff'
-		this.y = options.y || DEFAULT_OPTIONS.y
-    this.x = this.blockWidth / -2
+		this.round = 4
+		this.zIndex = 1000
 
 		this.bg = new Graphics()
-		this.bg.rect(0, 0, this.blockWidth, this.blockHeight)
+		this.bg.roundRect(0, 0, this.blockWidth, this.blockHeight, this.round)
 		this.bg.fill(this.bgColor)
 		this.addChild(this.bg)
 
 		this.fg = new Graphics()
-    this.fg.zIndex = 1
+		this.fg.roundRect(0, 0, this.blockWidth, this.blockHeight, this.round)
+		this.fg.fill(this.color)
+		this.fg.zIndex = 1
 		this.addChild(this.fg)
 
 		this.border = new Graphics()
-    this.border.zIndex = 2
+		this.border.zIndex = 2
 		this.border.setStrokeStyle({
 			color: this.borderColor,
 			width: this.borderThickness,
 		})
-		this.border.rect(0, 0, this.blockWidth, this.blockHeight)
-		this.bg.stroke(this.borderColor)
+		this.border.roundRect(0, 0, this.blockWidth, this.blockHeight, this.round)
+		this.border.stroke()
 		this.addChild(this.border)
 
 		this.update(this.health)
@@ -63,9 +66,8 @@ export class HealthBar extends Container {
 
 	update(health: number) {
 		const ratio = Math.max(0, Math.min(1, health / this.health))
-		this.fg.clear()
-		this.fg.rect(0, 0, this.blockWidth * ratio, this.blockHeight)
-		this.fg.fill(this.color)
+		if (!this.fg) return
+		this.fg.width = this.blockWidth * ratio
 	}
 
 	destroy() {

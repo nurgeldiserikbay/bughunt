@@ -3,10 +3,11 @@ import { FederatedPointerEvent, AnimatedSprite, Spritesheet } from 'pixi.js'
 import { FLY_SWATTER } from '../consts'
 
 import Game from '../Game'
+import { drawWave } from '../helpers'
 
 const AUDIO_LIST = ['swat1', 'swat2', 'swat3']
 
-const SIZE = 140
+const SIZE = 80
 
 export class FlySwatter extends AnimatedSprite {
 	game: Game
@@ -58,10 +59,12 @@ export class FlySwatter extends AnimatedSprite {
 			const dx = bug.x - hitX
 			const dy = bug.y - hitY
 			const dist = Math.sqrt(dx * dx + dy * dy)
-			if (dist < 30) {
-				bug.hit(power)
+
+			if (dist < SIZE) {
+				bug.hit((power * Math.max(0, SIZE - dist)) / SIZE)
 			}
 		})
+		drawWave(this.game.area.grid, hitX, hitY)
 		this.game.controls.play(
 			AUDIO_LIST[Math.floor(AUDIO_LIST.length * Math.random())]
 		)

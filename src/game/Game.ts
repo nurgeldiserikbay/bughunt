@@ -6,12 +6,16 @@ import { IAssetsSrc, IGameCallbacks, IGameOpt } from './interfaces'
 
 import Scene from './Scene'
 
-import { AREAS, BUGS, FLY_SWATTER, FOODS, ILevel, LEVEL } from './consts'
+import { AREAS, BUGS, FLY_SWATTER, FOODS, LEVEL } from './consts'
 
 import { Area } from './entities/Area'
 import { Food } from './entities/Food'
 import { Bug } from './entities/Bug'
 import { FlySwatter } from './entities/Swatter'
+
+import { ILevel } from './types'
+
+const FOODS_KEYS = Object.keys(FOODS)
 
 export default class Game {
 	scene: Scene
@@ -23,15 +27,17 @@ export default class Game {
 	levelOption?: ILevel
 	controls: IGameCallbacks
 	textStyle: TextStyle
+	textStyleRed: TextStyle
 	area: Area
 	foods: Food[]
 	bugs: Bug[]
 	timeOvered: boolean
 	swatter?: FlySwatter
 	stats: {
-		allDiedBugs: number
-		diedBugs: number
 		score: number
+		combo: number
+		lastKillTime: number
+		maxCombo: number
 	}
 
 	constructor({ scene, opt }: IGameOpt) {
@@ -42,8 +48,14 @@ export default class Game {
 		this.controls = opt
 		this.textStyle = new TextStyle({
 			fontFamily: 'Arial',
-			fontSize: 32,
+			fontSize: 28,
 			fill: 0xffffff,
+			stroke: 0x000000,
+		})
+		this.textStyleRed = new TextStyle({
+			fontFamily: 'Arial',
+			fontSize: 28,
+			fill: 0xff0000,
 			stroke: 0x000000,
 		})
 
@@ -53,21 +65,22 @@ export default class Game {
 		this.timeOvered = false
 
 		this.stats = {
-			allDiedBugs: 0,
-			diedBugs: 0,
 			score: 0,
+			combo: 0,
+			lastKillTime: 0,
+			maxCombo: 0,
 		}
 	}
 
 	async init() {
 		this.area.init()
 		this.scene.addElem(this.area.grid)
-		// this.area.grid.scale.set(
-		// 	Math.min(
-		// 		this.scene.canvas.clientWidth / this.scene.canvas.width,
-		// 		this.scene.canvas.clientHeight / this.scene.canvas.height
-		// 	)
-		// )
+		this.area.grid.scale.set(
+			Math.min(
+				this.scene.canvas.clientWidth / this.scene.canvas.width,
+				this.scene.canvas.clientHeight / this.scene.canvas.height
+			)
+		)
 		this.scene.addUpdate('area', () => {
 			this.area.updateUI()
 		})
@@ -79,7 +92,8 @@ export default class Game {
 		const assets = this.getLevelAssets(this.levelOption)
 		await this.preload(assets)
 		await this.loadSpritesheet(this.levelOption)
-
+		this.bugs = []
+		this.foods = []
 		this.timeOvered = false
 		this.setArea()
 		this.setSwatter()
@@ -88,17 +102,20 @@ export default class Game {
 	}
 
 	reset() {
-		this.stats.diedBugs = 0
-		this.controls.drawScore('diedBugs', this.stats.diedBugs)
 		this.foods.forEach((food) => food.die())
 		this.timeOvered = false
 		this.bugs.forEach((bug) => bug.remove())
 	}
 
-	createScorePopup(x: number, y: number, points: number) {
+	createScorePopup(
+		x: number,
+		y: number,
+		points: number,
+		textStyle?: TextStyle
+	) {
 		const scoreText = new Text({
 			text: `+${points}`,
-			style: this.textStyle,
+			style: textStyle || this.textStyle,
 		})
 		scoreText.zIndex = 1000
 
@@ -131,7 +148,8 @@ export default class Game {
 		const count = Math.min(Math.floor(Math.random() * round) + 1, 3)
 
 		for (let i = 0; i < count; i += 1) {
-			const foodType = this.levelOption.food
+			const foodType =
+				FOODS_KEYS[Math.floor(Math.random() * Object.keys(FOODS_KEYS).length)]
 
 			new Food(foodType, this)
 		}
@@ -146,7 +164,7 @@ export default class Game {
 		}, 0)
 		this.controls.drawScore('foodHealth', summ)
 
-		if (summ === 0) this.foodEated()
+		if (summ <= 0) this.foodEated()
 	}
 
 	foodEated() {
@@ -157,21 +175,22 @@ export default class Game {
 	createBugs(round: number) {
 		this.timerIds['bugs'] = setInterval(() => {
 			if (!this.levelOption) return
-			const alives = this.bugs.filter((b) => b.state !== 'dead').length
-			if (this.levelOption?.bugsCount > alives) this.createBug(round)
+			if (this.levelOption?.bugsCount > this.bugs.length) this.createBug(round)
 		}, 2000)
 	}
 
 	createBug(round: number) {
 		if (!this.levelOption) return
 
-		const count = Math.min(Math.floor(Math.random() * round) + 1, 3)
+		const count = Math.min(
+			Math.floor(Math.random() * this.levelOption.bugsCount) + 1,
+			50
+		)
 		const bugProb = Object.keys(this.levelOption.bugs).map((k) => Number(k))
 
-		const alives = this.bugs.filter((b) => b.state !== 'dead').length
 		for (
 			let i = 0;
-			i < Math.min(count, this.levelOption?.bugsCount - alives);
+			i < Math.min(count, this.levelOption?.bugsCount - this.bugs.length);
 			i += 1
 		) {
 			const bugType =
@@ -183,16 +202,36 @@ export default class Game {
 		this.bugCalculate()
 	}
 
-	bugCalculate() {
-		const alives = this.bugs.filter((b) => b.state !== 'dead').length
-		this.controls.drawScore('bugs', alives)
+	filterBugs() {
+		if (this.timerIds['bugsDied']) clearInterval(this.timerIds['bugsDied'])
+		this.timerIds['bugsDied'] = setTimeout(() => {
+			const died = this.bugs.filter((b) => b.state === 'dead')
+			let extraScore = 0
+			if (died.length > 1) {
+				extraScore = died.reduce((t, b) => t + b.score, 0)
+				this.createScorePopup(
+					died[0].x,
+					died[0].y,
+					extraScore,
+					this.textStyleRed
+				)
+			}
+			this.stats.score += extraScore
+			this.controls.drawScore('score', this.stats.score)
+			this.bugs = this.bugs.filter((b) => b.state !== 'dead')
+		}, 100)
+	}
 
-		if (alives === 0 && this.timeOvered) {
+	bugCalculate() {
+		const alives = this.bugs.filter((b) => b.state !== 'dead')
+		this.controls.drawScore('bugs', alives.length)
+
+		if (alives.length === 0 && this.timeOvered) {
 			const summFood = this.foods.reduce((t, f) => {
-				t += Math.max(f.health, 0)
+				t += Math.max(f.health * 0.1, 0)
 				return t
 			}, 0)
-			this.stats.score += summFood
+			this.stats.score += Math.round(summFood)
 
 			this.controls.drawScore('score', this.stats.score)
 
@@ -200,14 +239,14 @@ export default class Game {
 		}
 	}
 
-	bugDie(value: number) {
-		this.stats.diedBugs += 1
-		this.stats.allDiedBugs += 1
-		this.stats.score += value
-		this.bugCalculate()
-		this.controls.drawScore('diedBugs', this.stats.diedBugs)
-		this.controls.drawScore('allDiedBugs', this.stats.allDiedBugs)
+	bugDie(bug: Bug) {
+		this.filterBugs()
+
+		this.stats.score += bug.score
 		this.controls.drawScore('score', this.stats.score)
+		this.createScorePopup(bug.x, bug.y, bug.score)
+
+		this.bugCalculate()
 	}
 
 	timeOver() {
@@ -220,14 +259,14 @@ export default class Game {
 		if (!this.levelOption?.area) return
 		const area = AREAS[this.levelOption.area]
 		if (!area) return
-		const dim = Math.max(this.scene.canvas.width, this.scene.canvas.height)
 		this.area.setArea({
 			...area,
-			width: dim * 1.2,
-			height: dim * 1.2,
+			width: this.scene.canvas.width,
+			height: this.scene.canvas.height,
 			texture: this.loadedAssets[this.levelOption.area],
-			textureMask: this.loadedAssets[`${this.levelOption.area}-mask`],
-		})
+			areaName: this.levelOption.area,
+			// textureMask: this.loadedAssets[`${this.levelOption.area}-mask`],
+		}, this)
 	}
 
 	setSwatter() {
@@ -251,22 +290,30 @@ export default class Game {
 				loader: 'loadTextures',
 				src: AREAS[level.area].texture,
 			},
-			{
-				alias: `${level.area}-mask`,
-				loader: 'loadTextures',
-				src: AREAS[level.area].textureMask,
-			},
+			// {
+			// 	alias: `${level.area}-mask`,
+			// 	loader: 'loadTextures',
+			// 	src: AREAS[level.area].textureMask,
+			// },
 			{
 				alias: level.swatter,
 				loader: 'loadTextures',
 				src: FLY_SWATTER[level.swatter].texture,
 			},
 			{
-				alias: level.food,
+				alias: `${level.area}-animation`,
 				loader: 'loadTextures',
-				src: FOODS[level.food].texture,
+				src: AREAS[level.area].animationSpritesheet.meta.image,
 			},
 		]
+
+		Object.values(FOODS_KEYS).forEach((food) => {
+			assets.push({
+				alias: food,
+				loader: 'loadTextures',
+				src: FOODS[food].data.meta.image,
+			})
+		})
 
 		Object.values(level.bugs).forEach((bug) => {
 			assets.push({
@@ -290,19 +337,40 @@ export default class Game {
 	async loadSpritesheet(level: ILevel) {
 		const spritesheets: { [key: string]: Spritesheet } = {}
 
-		const spritesheet = new Spritesheet(
-			this.loadedAssets[level.swatter],
-			FLY_SWATTER[level.swatter].data
-		)
-		await spritesheet.parse()
-		spritesheets[level.swatter] = spritesheet
+		if (
+			!this.spritesheets[`${level.area}-animation`] &&
+			AREAS[level.area].animationSpritesheet
+		) {
+			const spritesheet = new Spritesheet(
+				this.loadedAssets[`${level.area}-animation`],
+				AREAS[level.area].animationSpritesheet
+			)
+			await spritesheet.parse()
+			spritesheets[`${level.area}-animation`] = spritesheet
+		}
 
-		const foodSpritesheet = new Spritesheet(
-			this.loadedAssets[level.food],
-			FOODS[level.food].data
+		if (!this.spritesheets[level.swatter]) {
+			const spritesheet = new Spritesheet(
+				this.loadedAssets[level.swatter],
+				FLY_SWATTER[level.swatter].data
+			)
+			await spritesheet.parse()
+			spritesheets[level.swatter] = spritesheet
+		}
+
+		await Promise.all(
+			Object.values(FOODS_KEYS)
+				.filter((food) => !this.spritesheets[food])
+				.map(async (food) => {
+					const spritesheet = new Spritesheet(
+						this.loadedAssets[food],
+						FOODS[food].data
+					)
+					await spritesheet.parse()
+
+					spritesheets[food] = spritesheet
+				})
 		)
-		await foodSpritesheet.parse()
-		spritesheets[level.food] = foodSpritesheet
 
 		await Promise.all(
 			Object.values(level.bugs)

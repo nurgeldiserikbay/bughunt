@@ -35,17 +35,18 @@ withDefaults(
 	font-family: LuckiestGuy;
 	font-weight: 300;
 	text-transform: uppercase;
-	font-size: 28px;
+	font-size: 38px;
 	line-height: 1;
-	letter-spacing: 2px;
+	letter-spacing: 6px;
 	padding-bottom: 15px;
 	padding-right: 5px;
 	box-sizing: border-box;
 	color: #fff;
 	background-size: contain;
 	background-color: transparent;
-	background-image: url('@/assets/img/button.png');
 	background-repeat: no-repeat;
+	-webkit-text-stroke: 2px black;
+	text-stroke: 2px black;
 
 	&--small {
 		font-size: 24px;

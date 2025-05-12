@@ -66,4 +66,8 @@ export default class Scene {
 	start() {
 		this.render()
 	}
+
+	destroy() {
+		this._app.destroy()
+	}
 }

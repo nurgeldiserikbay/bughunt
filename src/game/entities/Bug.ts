@@ -7,7 +7,7 @@ import Game from '../Game'
 import { Food } from './Food'
 import { HealthBar } from './HealthBar'
 
-const SIZE = 100
+const SIZE = 50
 
 export class Bug extends Container {
 	sprite: AnimatedSprite
@@ -21,6 +21,7 @@ export class Bug extends Container {
 	awareness: number
 	wanderAngle: number
 	waitTime: number
+	score: number
 	eatSpeed: number
 	isScared: boolean
 	lastMouseCheck: number
@@ -30,12 +31,14 @@ export class Bug extends Container {
 	healthBar: HealthBar
 	timerDie?: ReturnType<typeof setTimeout>
 	timer?: ReturnType<typeof setInterval>
+	animationSpeed: number
 
 	constructor(optName: string, game: Game) {
 		super()
+		const opt = BUGS[optName]
 		this.sprite = new AnimatedSprite(game.spritesheets[optName].animations.walk)
-		this.sprite.width = SIZE
-		this.sprite.height = SIZE
+		this.sprite.width = opt.width
+		this.sprite.height = opt.height
 		this.sprite.anchor.set(0.5)
 		this.addChild(this.sprite)
 		this.name = String(Math.random())
@@ -46,11 +49,12 @@ export class Bug extends Container {
 		this.spritesheets = game.spritesheets[optName]
 		this.state = 'walk'
 
-		const opt = BUGS[optName]
+		this.animationSpeed = BUGS[optName].animationSpeed
 		this.sprite.animationSpeed = BUGS[optName].animationSpeed
 		this.health = opt.health
 		this.appetite = opt.appetite
 		this.speed = opt.speed / 2
+		this.score = opt.score
 		this.dieSound = opt.dieSound
 		this.eatSpeed = opt.eatSpeed
 		this.intelligence = opt.intelligence
@@ -61,12 +65,12 @@ export class Bug extends Container {
 
 		this.healthBar = new HealthBar({
 			width: SIZE * 0.8,
-			height: 5,
+			height: 4,
 			health: this.health,
-			color: '#fc53ee',
+			color: '#00ff00',
 			y: -70,
 		})
-		this.addChild(this.healthBar)
+		game.area.addChild(this.healthBar)
 
 		this.sprite.play()
 		this.setPosition()
@@ -118,6 +122,7 @@ export class Bug extends Container {
 				this.wander()
 			}
 		}
+		this.updateHealtBar(this.x, this.y)
 	}
 
 	findBestFood(foods: Food[]) {
@@ -201,8 +206,6 @@ export class Bug extends Container {
 			this.sprite.textures = this.spritesheets.animations.idle
 		} else if (this.state !== 'walk' && state === 'walk') {
 			this.sprite.textures = this.spritesheets.animations.walk
-		} else if (state === 'dead') {
-			// this.sprite.textures = this.spritesheets.animations.dead
 		}
 		this.sprite.play()
 		this.state = state
@@ -214,49 +217,46 @@ export class Bug extends Container {
 		this.sprite.rotation = angle + Math.PI / 2
 		this.x += Math.cos(angle) * this.speed * 3
 		this.y += Math.sin(angle) * this.speed * 3
-		this.sprite.animationSpeed *= 3
+		this.sprite.animationSpeed = this.animationSpeed * 3
 		if (!this.isScared) {
 			this.changeState('walk')
 			setTimeout(() => {
-				this.isScared = false
-				this.sprite.animationSpeed /= 3
+				if (this.sprite) {
+					this.isScared = false
+					this.sprite.animationSpeed = this.animationSpeed
+					this.changeState('walk')
+				}
 			}, 1000)
 		}
 		this.isScared = true
+		this.updateHealtBar(this.x, this.y)
 	}
 
 	hit(damage: number) {
 		this.health -= damage
-		this.healthBar.update(this.health)
 		if (this.health < 0) {
 			this.die()
-		}
-		else {
+			return
+		} else {
 			this.runAway()
 		}
+		this.healthBar?.update(this.health)
 	}
 
 	die() {
 		if (this.state === 'dead') return
 		this.changeState('dead')
 		this.stopEating()
-		this.game.bugDie(this.appetite)
-		this.game.createScorePopup(this.x, this.y, this.appetite)
-		this.game.bugCalculate()
-
 		this.game.controls.play(this.dieSound)
-
-		// this.timerDie = setTimeout(() => {
-		// 	try {
-				this.remove()
-		// 	} catch (error) {}
-		// }, 5000)
+		this.remove()
+		this.game.bugDie(this)
 	}
 
 	remove() {
 		this.game.area.removeChild(this)
 		this.game.scene.removeUpdate(this.name)
-		this.game.bugs = this.game.bugs.filter((f) => f !== this)
+		this.game.area.removeChild(this.healthBar)
+		this.healthBar.destroy()
 	}
 
 	stopEating() {
@@ -280,5 +280,12 @@ export class Bug extends Container {
 			}
 			this.y = Math.random() * this.game.area.grid.height
 		}
+
+		this.updateHealtBar(this.x, this.y)
+	}
+
+	updateHealtBar(x: number, y: number) {
+		this.healthBar.x = x - this.healthBar.width / 2
+		this.healthBar.y = y - this.height / 2 - 25
 	}
 }

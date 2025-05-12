@@ -20,6 +20,10 @@ export default class GameController {
 		this._scene.start()
 	}
 
+	destroy() {
+		this._scene.destroy()
+	}
+
 	async start(round: number) {
 		this._game.start(round)
 	}

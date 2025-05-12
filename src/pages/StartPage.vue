@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import IconMusicalNote from '@/assets/img/musical-note.svg'
+import IconPublicRelation from '@/assets/img/public-relation.svg'
+
 import { onBeforeUnmount, onMounted } from 'vue'
 
 import { usePageStore } from '@/store/pageStore'
@@ -41,15 +44,19 @@ onBeforeUnmount(() => {
 
 		<div class="start-page__btns">
 			<button
-				:class="{ active: musicActive }"
-				class="start-page__music"
-				@click="toggleMusic(), playAudio('click')"
-			></button>
-			<button
 				:class="{ active: audioActive }"
-				class="start-page__sound"
+				class="start-page__music"
 				@click="toggleAudio(), playAudio('click')"
-			></button>
+			>
+				<IconPublicRelation />
+			</button>
+			<button
+				:class="{ active: musicActive }"
+				class="start-page__sound"
+				@click="toggleMusic(), playAudio('click')"
+			>
+				<IconMusicalNote />
+			</button>
 		</div>
 
 		<a
@@ -97,37 +104,34 @@ onBeforeUnmount(() => {
 		gap: 18px;
 
 		button {
-			width: 40px;
-			height: 40px;
-			border-radius: 8px;
+			border-radius: 100%;
 			border: none;
 			outline: none;
 			cursor: pointer;
 			opacity: 0.5;
 			transition: 0.3s linear;
-			background-size: cover;
-			background-color: transparent;
+			background: rgba(0, 0, 0, 0.3);
+			padding: 10px;
 
 			&.active {
 				opacity: 1;
 			}
+
+			svg {
+				width: 30px;
+				height: 30px;
+			}
 		}
-	}
-
-	&__music {
-		background-image: url('@/assets/img/music.png');
-	}
-
-	&__sound {
-		background-image: url('@/assets/img/sound.png');
 	}
 }
 
 .privacy {
 	width: fit-content;
 	display: inline-block;
-	font-size: 16px;
-	color: #060606;
+	font-size: 24px;
+	color: rgb(255, 255, 255);
+	-webkit-text-stroke: 2px black;
+	text-stroke: 2px black;
 	text-decoration: none;
 	letter-spacing: 4px;
 	text-align: center;

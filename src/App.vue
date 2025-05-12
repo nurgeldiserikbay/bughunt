@@ -8,8 +8,10 @@ import { Fullscreen } from '@boengli/capacitor-fullscreen'
 import Admob from '@/utils/admob'
 
 import { usePageStore } from '@/store/pageStore'
+import { useGameStore } from '@/store/gameStore'
 
 const pageStore = usePageStore()
+const gameStore = useGameStore()
 
 onMounted(async () => {
 	if (Capacitor.getPlatform() === 'android') {
@@ -22,6 +24,8 @@ onMounted(async () => {
 		await StatusBar.setOverlaysWebView({ overlay: true })
 		await SplashScreen.hide()
 	}
+
+	await gameStore.loadData()
 })
 </script>
 
@@ -35,7 +39,7 @@ onMounted(async () => {
 .wrapper {
 	position: relative;
 	width: 100%;
-	max-width: 680px;
+	max-width: 580px;
 	margin: 0 auto;
 	min-height: 100dvh;
 	height: 100dvh;

@@ -1,4 +1,4 @@
-import { AnimatedSprite, Spritesheet } from 'pixi.js'
+import { AnimatedSprite, Spritesheet, Ticker } from 'pixi.js'
 
 import { FOODS } from '../consts'
 
@@ -6,7 +6,10 @@ import Game from '../Game'
 
 import { HealthBar } from './HealthBar'
 
-const SIZE = 120
+const SIZE = {
+	width: 60,
+	height: 60,
+}
 
 export class Food extends AnimatedSprite {
 	name: string
@@ -17,12 +20,18 @@ export class Food extends AnimatedSprite {
 	min: { x: number; y: number }
 	delta: { x: number; y: number }
 	healthBar: HealthBar
+	animationTicker?: Ticker
+	initialY: number
+	initialWidth: number
+	initialHeight: number
 
 	constructor(optName: string, game: Game) {
 		super(game.spritesheets[optName].animations.eat)
 		this.name = optName
-		this.width = SIZE
-		this.height = SIZE
+		this.width = SIZE.width
+		this.height = SIZE.height
+		this.initialWidth = SIZE.width
+		this.initialHeight = SIZE.height
 		this.anchor.set(0.5)
 		this.spritesheets = game.spritesheets[optName]
 
@@ -32,13 +41,13 @@ export class Food extends AnimatedSprite {
 		this.attractiveness = opt.attractiveness
 
 		this.healthBar = new HealthBar({
-			width: SIZE * 3.5,
-			height: 10,
+			width: SIZE.width,
+			height: 4,
 			health: this.health,
-			color: '#fc53ee',
+			color: '#00ff00',
 		})
 
-		this.addChild(this.healthBar)
+		game.area.addChild(this.healthBar)
 
 		game.foods.push(this)
 		game.area.addChild(this)
@@ -54,6 +63,23 @@ export class Food extends AnimatedSprite {
 		}
 
 		this.setPosition()
+		this.initialY = this.y
+		this.startBounceAnimation()
+	}
+
+	startBounceAnimation() {
+		this.animationTicker = new Ticker()
+		this.animationTicker.add(() => {
+			// Плавное подпрыгивание с помощью синуса
+			this.y = this.initialY + Math.sin(Date.now() * 0.002) * 3
+			// Плавное сжатие/разжатие
+			const scale = 1 + Math.sin(Date.now() * 0.003) * 0.02
+			this.width = this.initialWidth * scale
+			this.height = this.initialHeight * scale
+			// Обновляем позицию healthBar вместе с едой
+			this.healthBar.y = this.y - this.height / 2 - 20
+		})
+		this.animationTicker.start()
 	}
 
 	damage(damage: number) {
@@ -61,15 +87,16 @@ export class Food extends AnimatedSprite {
 
 		if (this.health < 0) {
 			this.die()
-		}
-		else if (this.health < 0.3 * FOODS[this.name].health) {
+			this.game.foodCalculate()
+			return
+		} else if (this.health < 0.2 * FOODS[this.name].health) {
+			this.currentFrame = 3
+		} else if (this.health < 0.4 * FOODS[this.name].health) {
 			this.currentFrame = 2
-			this.width = SIZE * 0.3
-			this.height = SIZE * 0.3
 		} else if (this.health < 0.6 * FOODS[this.name].health) {
 			this.currentFrame = 1
-			this.width = SIZE * 0.6
-			this.height = SIZE * 0.6
+		} else if (this.health < 0.8 * FOODS[this.name].health) {
+			this.currentFrame = 0
 		}
 
 		this.healthBar.update(this.health)
@@ -77,6 +104,12 @@ export class Food extends AnimatedSprite {
 	}
 
 	die() {
+		if (this.animationTicker) {
+			this.animationTicker.destroy()
+			this.animationTicker = undefined
+		}
+		this.healthBar.destroy()
+		this.game.area.removeChild(this.healthBar)
 		this.game.area.removeChild(this)
 		this.game.foods = this.game.foods.filter((f) => f !== this)
 	}
@@ -84,5 +117,9 @@ export class Food extends AnimatedSprite {
 	setPosition() {
 		this.x = this.min.x + this.delta.x * Math.random()
 		this.y = this.min.y + this.delta.y * Math.random()
+		this.initialY = this.y
+
+		this.healthBar.x = this.x - this.width / 2
+		this.healthBar.y = this.y - this.height / 2 - 20
 	}
 }

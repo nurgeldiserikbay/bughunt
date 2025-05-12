@@ -1,5 +1,11 @@
 <script lang="ts" setup>
-withDefaults(
+import IconHome from '@/assets/img/home.svg'
+
+import { useGameStore } from '@/store/gameStore'
+
+const gameStore = useGameStore()
+
+const $props = withDefaults(
 	defineProps<{
 		level: number
 		result: any
@@ -8,6 +14,11 @@ withDefaults(
 )
 
 const $emits = defineEmits(['close'])
+
+function clickHome() {
+	$emits('close')
+	gameStore.setGameState($props.level, $props.result.score)
+}
 </script>
 
 <template>
@@ -16,28 +27,30 @@ const $emits = defineEmits(['close'])
 			<div class="result__title">{{ `Round ${level}` }}</div>
 			<div class="result__table">
 				<div class="result__item">
-					<img src="@/assets/img/star.png" alt="" />
-					<div>{{ result.score }}</div>
+					<div class="result__item-date">
+						<img src="@/assets/img/star.png" alt="" />
+						{{ result.score > gameStore.bestResult.score ? 'New Record' : '' }}
+					</div>
+					<div class="result__item-score" style="font-size: 32px">
+						{{ result.score }}
+					</div>
 				</div>
-				<div class="result__item">
-					<img
-						src="@/assets/img/__red_beetle_dead.png"
-						alt=""
-						class="result__dead"
-					/>
-					<div>{{ result.diedBugs }}</div>
+
+				<div class="result__subtitle">
+					{{ 'Best results' }} <img src="@/assets/img/star.png" alt="" />
 				</div>
-				<div class="result__item">
-					<div>Total</div>
-					<img
-						src="@/assets/img/__red_beetle_dead.png"
-						alt=""
-						class="result__dead"
-					/>
-					<div>{{ result.allDiedBugs }}</div>
+				<div
+					v-for="(item, index) in gameStore.gameStats"
+					:key="index"
+					class="result__item"
+				>
+					<div class="result__item-date">
+						{{ `${new Date(item.date).toLocaleDateString()} ${new Date(item.date).toLocaleTimeString().slice(0, 5)}` }}
+					</div>
+					<div class="result__item-score">{{ item.score }}</div>
 				</div>
 			</div>
-			<button class="result__btn" @click="$emits('close')" />
+			<button class="result__btn" @click="clickHome"><IconHome /></button>
 		</div>
 	</div>
 </template>
@@ -61,7 +74,7 @@ const $emits = defineEmits(['close'])
 		position: relative;
 		padding: 30px 5px 40px;
 		border-radius: 12px;
-		height: 60vh;
+		height: 80vh;
 		width: 100%;
 		box-sizing: border-box;
 		display: flex;
@@ -69,12 +82,11 @@ const $emits = defineEmits(['close'])
 		flex-direction: column;
 		align-items: center;
 		overflow: hidden;
-		margin-bottom: 100px;
 		width: 70%;
 		backdrop-filter: blur(3px);
 		border-radius: 18px;
-		font-size: 22px;
-		color: red;
+		font-size: 28px;
+		color: #ffffff;
 		-webkit-text-stroke: 2px black;
 		text-stroke: 2px black;
 	}
@@ -89,13 +101,24 @@ const $emits = defineEmits(['close'])
 		flex-grow: 1;
 		padding-bottom: 30px;
 		letter-spacing: 3px;
-		font-size: 28px;
+		font-size: 36px;
 		text-align: center;
 	}
 
 	&__title {
-		font-size: 26px;
+		font-size: 36px;
 		margin-bottom: 15px;
+	}
+
+	&__subtitle {
+		font-size: 24px;
+		display: flex;
+		align-items: center;
+		gap: 10px;
+
+		img {
+			width: 35px;
+		}
 	}
 
 	&__item {
@@ -103,8 +126,9 @@ const $emits = defineEmits(['close'])
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		gap: 20px;
 		text-align: center;
-		font-size: 25px;
+		font-size: 24px;
 
 		img {
 			width: 35px;
@@ -115,18 +139,29 @@ const $emits = defineEmits(['close'])
 		width: 50px;
 	}
 
+	&__item-date {
+		font-size: 16px;
+		display: flex;
+		align-items: center;
+		gap: 20px;
+		-webkit-text-stroke: 1px black;
+		text-stroke: 1px black;
+	}
+
 	&__btn {
 		flex-shrink: 0;
 		display: block;
-		width: 46px;
-		height: 46px;
-		background-color: transparent;
 		border-radius: 10px;
+		padding: 10px;
 		border: none;
 		cursor: pointer;
 		background-size: cover;
-		background-color: transparent;
-		background-image: url('@/assets/img/home.png');
+		background: rgba(0, 0, 0, 0.3);
+
+		svg {
+			width: 36px;
+			height: 36px;
+		}
 	}
 }
 </style>

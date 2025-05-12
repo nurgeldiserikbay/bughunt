@@ -1,9 +1,18 @@
-import { Container, FederatedPointerEvent, Point, Sprite } from 'pixi.js'
+import {
+	Container,
+	FederatedPointerEvent,
+	Point,
+	Sprite,
+	Ticker,
+	Spritesheet,
+	AnimatedSprite,
+} from 'pixi.js'
 
-import { I_AreaOpt } from '../consts'
 import { IPoint } from '../interfaces'
 
 import Scene from '../Scene'
+import { I_AreaOpt } from '../types'
+import Game from '../Game'
 
 export class Area {
 	scene: Scene
@@ -19,6 +28,12 @@ export class Area {
 	}
 	bg: Sprite | undefined
 	bgMask: Sprite | undefined
+	animationTicker: Ticker | null
+	animationElements: Sprite[]
+	spritesheets?: Spritesheet
+	option?: I_AreaOpt
+	waitTime: number
+	nextAnimationSpawn: number
 
 	constructor(scene: Scene) {
 		this.scene = scene
@@ -33,16 +48,21 @@ export class Area {
 			top: 0,
 			bottom: 0,
 		}
+		this.animationTicker = null
+		this.animationElements = []
+		this.waitTime = 0
+		this.nextAnimationSpawn = 0
 	}
 
 	init() {
-		this.grid.on('pointerdown', this.onMouseDown.bind(this))
-		this.grid.on('pointerup', this.onMouseUp.bind(this))
-		this.grid.on('pointerleave', this.onMouseUp.bind(this))
-		this.grid.on('pointermove', this.updateMousePos.bind(this))
+		// this.grid.on('pointerdown', this.onMouseDown.bind(this))
+		// this.grid.on('pointerup', this.onMouseUp.bind(this))
+		// this.grid.on('pointerleave', this.onMouseUp.bind(this))
+		// this.grid.on('pointermove', this.updateMousePos.bind(this))
 	}
 
-	async setArea(option: I_AreaOpt) {
+	async setArea(option: I_AreaOpt, game: Game) {
+		this.option = option
 		this.grid.x = (this.scene.app.screen.width - option.width) / 2
 		this.grid.y = (this.scene.app.screen.height - option.height) / 2
 		this.setMapBounds(option)
@@ -56,17 +76,102 @@ export class Area {
 		}
 		this.bg.width = option.width
 		this.bg.height = option.height
+		this.spritesheets = game.spritesheets[`${option.areaName}-animation`]
 
-		if (this.bgMask) {
-			this.bgMask.texture = option.textureMask
-		} else {
-			this.bgMask = new Sprite()
-			this.bgMask.texture = option.textureMask
-			this.grid.addChild(this.bgMask)
-			this.bgMask.zIndex = 5
+		// Stop previous animations if any
+		if (this.animationTicker) {
+			this.animationTicker.destroy()
+			this.animationTicker = null
 		}
-		this.bgMask.width = option.width
-		this.bgMask.height = option.height
+		
+		// Remove existing animation elements
+		this.animationElements.forEach(element => {
+			element.destroy()
+			this.grid.removeChild(element)
+		})
+		this.animationElements = []
+
+		// Start new animation system
+		this.startAnimations()
+	}
+
+	createAnimationElement() {
+		if (!this.spritesheets || !this.option) return null
+
+		const element = new AnimatedSprite(this.spritesheets.animations.run)
+		element.alpha = 0.2 + Math.random() * 0.5 // Random opacity between 0.2 and 0.7
+		element.width = this.option.animationWidth * (0.8 + Math.random() * 0.4) // 80-120% of base size
+		element.height = this.option.animationHeight * (0.8 + Math.random() * 0.4)
+		element.x = Math.random() * this.option.width
+		element.y = -30 // Start above screen
+		element.tint = 0xffffff
+		;(element as any).speed = this.option.animationMoveSpeed || 1
+		element.animationSpeed = this.option.animationSpeed || 0.1
+		element.play()
+		;(element as any).waitTime = 0
+		return element
+	}
+
+	startAnimations() {
+		if (this.animationTicker) {
+			this.animationTicker.destroy()
+		}
+
+		this.animationTicker = new Ticker()
+		this.animationTicker.add(() => {
+			// Check if we should spawn a new animation
+			if (this.nextAnimationSpawn <= 0) {
+				if (this.animationElements.length < 5 && Math.random() < 0.3) { // 10% chance to spawn if less than 5 elements
+					const newElement = this.createAnimationElement()
+					if (newElement) {
+						this.grid.addChild(newElement)
+						this.animationElements.push(newElement)
+					}
+				}
+				this.nextAnimationSpawn = 60 + Math.floor(Math.random() * 120) // Wait 1-3 seconds before next spawn check
+			} else {
+				this.nextAnimationSpawn--
+			}
+
+			// Update existing animations
+			this.animationElements = this.animationElements.filter((element) => {
+				if ((element as any).waitTime > 0) {
+					(element as any).waitTime--
+					return true
+				}
+
+				element.y += (element as any).speed
+
+				// When element goes below screen
+				if (element.y > this.grid.height + 30) {
+					if (Math.random() < 0.3) { // 30% chance to remove element
+						this.grid.removeChild(element)
+						element.destroy()
+						return false
+					} else {
+						element.y = -30 // Reset to top
+						element.x = Math.random() * this.grid.width
+						element.alpha = 0.2 + Math.random() * 0.5 // New random opacity
+						;(element as any).waitTime = 30 + Math.floor(Math.random() * 90) // Wait 0.5-2 seconds
+					}
+				}
+				return true
+			})
+		})
+		this.animationTicker.start()
+	}
+
+	clearAnimations() {
+		if (this.animationTicker) {
+			this.animationTicker.destroy()
+			this.animationTicker = null
+		}
+
+		this.animationElements.forEach((element) => {
+			this.grid.removeChild(element)
+			element.destroy()
+		})
+		this.animationElements = []
 	}
 
 	addChild(child: Sprite | Container) {
