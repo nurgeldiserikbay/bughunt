@@ -26,11 +26,11 @@ export interface I_LevelOpt {
 }
 
 export interface IArea {
-	animationSpritesheet: ISpritesheet
-	animationSpeed: number
-	animationWidth: number
-	animationHeight: number
-	animationMoveSpeed: number
+	animationSpritesheet?: ISpritesheet
+	animationSpeed?: number
+	animationWidth?: number
+	animationHeight?: number
+	animationMoveSpeed?: number
 	texture: string
 	width: number
 	height: number

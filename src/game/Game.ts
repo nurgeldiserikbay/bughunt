@@ -98,7 +98,7 @@ export default class Game {
 		this.setArea()
 		this.setSwatter()
 		this.createFood(round)
-		this.createBugs(round)
+		this.createBugs()
 	}
 
 	reset() {
@@ -172,14 +172,14 @@ export default class Game {
 		this.controls.endGame()
 	}
 
-	createBugs(round: number) {
+	createBugs() {
 		this.timerIds['bugs'] = setInterval(() => {
 			if (!this.levelOption) return
-			if (this.levelOption?.bugsCount > this.bugs.length) this.createBug(round)
+			if (this.levelOption?.bugsCount > this.bugs.length) this.createBug()
 		}, 2000)
 	}
 
-	createBug(round: number) {
+	createBug() {
 		if (!this.levelOption) return
 
 		const count = Math.min(

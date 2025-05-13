@@ -83,9 +83,9 @@ export class Area {
 			this.animationTicker.destroy()
 			this.animationTicker = null
 		}
-		
+
 		// Remove existing animation elements
-		this.animationElements.forEach(element => {
+		this.animationElements.forEach((element) => {
 			element.destroy()
 			this.grid.removeChild(element)
 		})
@@ -99,9 +99,9 @@ export class Area {
 		if (!this.spritesheets || !this.option) return null
 
 		const element = new AnimatedSprite(this.spritesheets.animations.run)
-		element.alpha = 0.2 + Math.random() * 0.5 // Random opacity between 0.2 and 0.7
-		element.width = this.option.animationWidth * (0.8 + Math.random() * 0.4) // 80-120% of base size
-		element.height = this.option.animationHeight * (0.8 + Math.random() * 0.4)
+		const sizeScale = 0.8 + Math.random() * 0.4
+		element.width = this.option.animationWidth * sizeScale // 80-120% of base size
+		element.height = this.option.animationHeight * sizeScale
 		element.x = Math.random() * this.option.width
 		element.y = -30 // Start above screen
 		element.tint = 0xffffff
@@ -121,7 +121,8 @@ export class Area {
 		this.animationTicker.add(() => {
 			// Check if we should spawn a new animation
 			if (this.nextAnimationSpawn <= 0) {
-				if (this.animationElements.length < 5 && Math.random() < 0.3) { // 10% chance to spawn if less than 5 elements
+				if (this.animationElements.length < 5 && Math.random() < 0.3) {
+					// 10% chance to spawn if less than 5 elements
 					const newElement = this.createAnimationElement()
 					if (newElement) {
 						this.grid.addChild(newElement)
@@ -136,22 +137,23 @@ export class Area {
 			// Update existing animations
 			this.animationElements = this.animationElements.filter((element) => {
 				if ((element as any).waitTime > 0) {
-					(element as any).waitTime--
+					;(element as any).waitTime--
 					return true
 				}
 
 				element.y += (element as any).speed
+				element.x += Math.sin(element.y / 50) * 0.5 // Smooth wind-like movement
 
 				// When element goes below screen
 				if (element.y > this.grid.height + 30) {
-					if (Math.random() < 0.3) { // 30% chance to remove element
+					if (Math.random() < 0.3) {
+						// 30% chance to remove element
 						this.grid.removeChild(element)
 						element.destroy()
 						return false
 					} else {
 						element.y = -30 // Reset to top
 						element.x = Math.random() * this.grid.width
-						element.alpha = 0.2 + Math.random() * 0.5 // New random opacity
 						;(element as any).waitTime = 30 + Math.floor(Math.random() * 90) // Wait 0.5-2 seconds
 					}
 				}

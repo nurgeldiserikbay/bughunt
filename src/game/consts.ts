@@ -25,15 +25,18 @@ import { IAreas, IBugs, IFoods, ILevels, ISwatters } from './types'
 
 import leaf_spritesheet from './sprites/additionals/leaf_spritesheet'
 import leaf_flip_spritesheet from './sprites/additionals/leaf_flip_spritesheet'
+import leaf_brown_spritesheet from './sprites/additionals/leaf_brown_spritesheet'
+import dung_spritesheet from './sprites/additionals/dung_spritesheet'
+import paper_spritesheet from './sprites/additionals/paper_spritesheet'
 
 export const AREAS: IAreas = {
 	garden1: {
 		texture: '/img/areas/garden-1.png',
 		animationSpritesheet: leaf_spritesheet,
 		animationSpeed: 0.1,
-		animationWidth: 30,
-		animationHeight: 30,
-		animationMoveSpeed: 0.2,
+		animationWidth: 50,
+		animationHeight: 50,
+		animationMoveSpeed: 1,
 		// textureMask: '/img/areas/garden-mask.png',
 		width: 400,
 		height: 400,
@@ -41,20 +44,20 @@ export const AREAS: IAreas = {
 	garden2: {
 		texture: '/img/areas/garden-2.png',
 		animationSpritesheet: leaf_flip_spritesheet,
-		animationSpeed: 0.6,
-		animationWidth: 30,
-		animationHeight: 30,
-		animationMoveSpeed: 2.4,
+		animationSpeed: 0.2,
+		animationWidth: 80,
+		animationHeight: 80,
+		animationMoveSpeed: 1.4,
 		// textureMask: '/img/areas/garden-mask.png',
 		width: 400,
 		height: 400,
 	},
 	garden3: {
 		texture: '/img/areas/garden-3.png',
-		animationSpritesheet: leaf_spritesheet,
-		animationSpeed: 0.3,
-		animationWidth: 15,
-		animationHeight: 15,
+		animationSpritesheet: leaf_brown_spritesheet,
+		animationSpeed: 0.1,
+		animationWidth: 50,
+		animationHeight: 50,
 		animationMoveSpeed: 1,
 		// textureMask: '/img/areas/garden-mask.png',
 		width: 400,
@@ -62,21 +65,21 @@ export const AREAS: IAreas = {
 	},
 	garden4: {
 		texture: '/img/areas/garden-4.png',
-		animationSpritesheet: leaf_spritesheet,
-		animationSpeed: 0.3,
-		animationWidth: 15,
-		animationHeight: 15,
-		animationMoveSpeed: 1,
+		animationSpritesheet: dung_spritesheet,
+		animationSpeed: 0.2,
+		animationWidth: 40,
+		animationHeight: 40,
+		animationMoveSpeed: 1.4,
 		// textureMask: '/img/areas/garden-mask.png',
 		width: 400,
 		height: 400,
 	},
 	garden5: {
 		texture: '/img/areas/garden-5.png',
-		animationSpritesheet: leaf_spritesheet,
-		animationSpeed: 0.3,
-		animationWidth: 15,
-		animationHeight: 15,
+		animationSpritesheet: paper_spritesheet,
+		animationSpeed: 0.1,
+		animationWidth: 50,
+		animationHeight: 50,
 		animationMoveSpeed: 1,
 		// textureMask: '/img/areas/garden-mask.png',
 		width: 400,
@@ -84,11 +87,11 @@ export const AREAS: IAreas = {
 	},
 	garden6: {
 		texture: '/img/areas/garden-6.png',
-		animationSpritesheet: leaf_spritesheet,
-		animationSpeed: 0.3,
-		animationWidth: 15,
-		animationHeight: 15,
-		animationMoveSpeed: 1,
+		// animationSpritesheet: leaf_spritesheet,
+		// animationSpeed: 0.3,
+		// animationWidth: 15,
+		// animationHeight: 15,
+		// animationMoveSpeed: 1,
 		// textureMask: '/img/areas/garden-mask.png',
 		width: 400,
 		height: 400,
@@ -307,7 +310,7 @@ export const FLY_SWATTER: ISwatters = {
 
 export const LEVEL: ILevels = {
 	1: {
-		area: 'garden2',
+		area: 'garden1',
 		bugsCount: 6,
 		swatter: 'purple',
 		bugs: {
@@ -329,7 +332,7 @@ export const LEVEL: ILevels = {
 		},
 	},
 	3: {
-		area: 'garden2',
+		area: 'garden1',
 		bugsCount: 10,
 		swatter: 'purple',
 		bugs: {
@@ -341,7 +344,7 @@ export const LEVEL: ILevels = {
 		},
 	},
 	4: {
-		area: 'garden3',
+		area: 'garden2',
 		bugsCount: 12,
 		swatter: 'purple',
 		bugs: {
@@ -354,7 +357,7 @@ export const LEVEL: ILevels = {
 		},
 	},
 	5: {
-		area: 'garden4',
+		area: 'garden2',
 		bugsCount: 14,
 		swatter: 'purple',
 		bugs: {
@@ -368,7 +371,7 @@ export const LEVEL: ILevels = {
 		},
 	},
 	6: {
-		area: 'garden5',
+		area: 'garden2',
 		bugsCount: 16,
 		swatter: 'purple',
 		bugs: {
@@ -383,7 +386,7 @@ export const LEVEL: ILevels = {
 		},
 	},
 	7: {
-		area: 'garden6',
+		area: 'garden3',
 		bugsCount: 18,
 		swatter: 'purple',
 		bugs: {
@@ -399,7 +402,7 @@ export const LEVEL: ILevels = {
 		},
 	},
 	8: {
-		area: 'garden1',
+		area: 'garden3',
 		bugsCount: 18,
 		swatter: 'purple',
 		bugs: {
@@ -416,7 +419,7 @@ export const LEVEL: ILevels = {
 		},
 	},
 	9: {
-		area: 'garden2',
+		area: 'garden3',
 		bugsCount: 18,
 		swatter: 'purple',
 		bugs: {
@@ -433,7 +436,7 @@ export const LEVEL: ILevels = {
 		},
 	},
 	10: {
-		area: 'garden3',
+		area: 'garden4',
 		bugsCount: 18,
 		swatter: 'purple',
 		bugs: {
@@ -467,7 +470,7 @@ export const LEVEL: ILevels = {
 		},
 	},
 	12: {
-		area: 'garden5',
+		area: 'garden4',
 		bugsCount: 25,
 		swatter: 'purple',
 		bugs: {
@@ -484,7 +487,7 @@ export const LEVEL: ILevels = {
 		},
 	},
 	13: {
-		area: 'garden6',
+		area: 'garden5',
 		bugsCount: 30,
 		swatter: 'purple',
 		bugs: {
@@ -501,7 +504,7 @@ export const LEVEL: ILevels = {
 		},
 	},
 	14: {
-		area: 'garden6',
+		area: 'garden5',
 		bugsCount: 40,
 		swatter: 'purple',
 		bugs: {
