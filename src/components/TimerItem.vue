@@ -15,6 +15,8 @@ const $props = withDefaults(
 const $emits = defineEmits(['timeend', 'addtimescore'])
 
 let timerId: ReturnType<typeof setInterval> | undefined
+let lastTime = Date.now()
+let isPaused = false
 
 const date = ref(0)
 const getTimeValue = computed(() => {
@@ -47,26 +49,54 @@ watch(
 
 onMounted(() => {
 	createTimer()
+	document.addEventListener('visibilitychange', handleVisibilityChange)
 })
 
 onBeforeUnmount(() => {
 	clearTimer()
+	document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
+
+function handleVisibilityChange() {
+	if (document.hidden) {
+		pauseTimer()
+	} else {
+		resumeTimer()
+	}
+}
 
 function createTimer() {
 	clearTimer()
 	date.value = getTimeValue.value
+	lastTime = Date.now()
+	isPaused = false
 	timerId = setInterval(() => {
-		date.value -= 1
-		if (date.value === 0) {
-			clearTimer()
-			$emits('timeend')
+		if (!isPaused) {
+			const now = Date.now()
+			const delta = now - lastTime
+			lastTime = now
+			
+			date.value -= delta / 100
+			if (date.value <= 0) {
+				date.value = 0
+				clearTimer()
+				$emits('timeend')
+			}
 		}
-	}, 100)
+	}, 16)
 }
 
 function clearTimer() {
 	if (timerId) clearInterval(timerId)
+}
+
+function pauseTimer() {
+	isPaused = true
+}
+
+function resumeTimer() {
+	isPaused = false
+	lastTime = Date.now()
 }
 </script>
 

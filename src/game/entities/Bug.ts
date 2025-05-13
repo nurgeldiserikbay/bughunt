@@ -81,7 +81,7 @@ export class Bug extends Container {
 	}
 
 	move() {
-		if (this.state === 'dead') return
+		if (this.state === 'dead' || this.game.isPaused) return
 
 		if (this.isScared) {
 			this.runAway()
@@ -130,6 +130,8 @@ export class Bug extends Container {
 		let bestScore = -Infinity
 
 		for (const food of foods) {
+			if (food.health <= 0) continue
+
 			const dx = food.x - this.x
 			const dy = food.y - this.y
 			const dist = Math.sqrt(dx * dx + dy * dy)
@@ -173,7 +175,7 @@ export class Bug extends Container {
 
 	eat(food: Food) {
 		food.damage(this.appetite)
-		if (food.health < 0) this.stopEating()
+		if (food.health <= 0) this.stopEating()
 	}
 
 	wander() {
@@ -234,7 +236,7 @@ export class Bug extends Container {
 
 	hit(damage: number) {
 		this.health -= damage
-		if (this.health < 0) {
+		if (this.health <= 0) {
 			this.die()
 			return
 		} else {
@@ -257,11 +259,14 @@ export class Bug extends Container {
 		this.game.scene.removeUpdate(this.name)
 		this.game.area.removeChild(this.healthBar)
 		this.healthBar.destroy()
+		this.sprite.destroy()
 	}
 
 	stopEating() {
-		clearInterval(this.timer)
-		this.timer = undefined
+		if (this.timer) {
+			clearInterval(this.timer)
+			this.timer = undefined
+		}
 	}
 
 	setPosition() {
@@ -287,5 +292,16 @@ export class Bug extends Container {
 	updateHealtBar(x: number, y: number) {
 		this.healthBar.x = x - this.healthBar.width / 2
 		this.healthBar.y = y - this.height / 2 - 25
+	}
+
+	pause() {
+		this.sprite.stop()
+		if (this.timer) {
+			clearInterval(this.timer)
+		}
+	}
+
+	resume() {
+		this.sprite.play()
 	}
 }

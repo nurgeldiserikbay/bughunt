@@ -11,7 +11,7 @@ import {
 import { IPoint } from '../interfaces'
 
 import Scene from '../Scene'
-import { I_AreaOpt } from '../types'
+import { I_AreaOpt, IArea } from '../types'
 import Game from '../Game'
 
 export class Area {
@@ -61,7 +61,7 @@ export class Area {
 		// this.grid.on('pointermove', this.updateMousePos.bind(this))
 	}
 
-	async setArea(option: I_AreaOpt, game: Game) {
+	async setArea(option: I_AreaOpt & IArea, game: Game) {
 		this.option = option
 		this.grid.x = (this.scene.app.screen.width - option.width) / 2
 		this.grid.y = (this.scene.app.screen.height - option.height) / 2

@@ -27,4 +27,12 @@ export default class GameController {
 	async start(round: number) {
 		this._game.start(round)
 	}
+
+	pause() {
+		this._game.pause()
+	}
+
+	resume() {
+		this._game.resume()
+	}
 }

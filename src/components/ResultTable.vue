@@ -29,23 +29,23 @@ function clickHome() {
 				<div class="result__item">
 					<div class="result__item-date">
 						<img src="@/assets/img/star.png" alt="" />
-						{{ result.score > gameStore.bestResult.score ? 'New Record' : '' }}
+						{{ result.score > (gameStore?.bestResult?.score || 0) ? 'New Record' : '' }}
 					</div>
 					<div class="result__item-score" style="font-size: 32px">
 						{{ result.score }}
 					</div>
 				</div>
 
-				<div class="result__subtitle">
-					{{ 'Best results' }} <img src="@/assets/img/star.png" alt="" />
+				<div v-if="gameStore?.gameStats?.length" class="result__subtitle">
+					{{ 'The bests' }} <img src="@/assets/img/star.png" alt="" />
 				</div>
 				<div
-					v-for="(item, index) in gameStore.gameStats"
+					v-for="(item, index) in (gameStore.gameStats || [])"
 					:key="index"
 					class="result__item"
 				>
 					<div class="result__item-date">
-						{{ `${new Date(item.date).toLocaleDateString()} ${new Date(item.date).toLocaleTimeString().slice(0, 5)}` }}
+						{{ `${new Date(item.date).toLocaleDateString()}` }}
 					</div>
 					<div class="result__item-score">{{ item.score }}</div>
 				</div>
@@ -106,12 +106,12 @@ function clickHome() {
 	}
 
 	&__title {
-		font-size: 36px;
+		font-size: 32px;
 		margin-bottom: 15px;
 	}
 
 	&__subtitle {
-		font-size: 24px;
+		font-size: 20px;
 		display: flex;
 		align-items: center;
 		gap: 10px;

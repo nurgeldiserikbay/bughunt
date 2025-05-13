@@ -39,6 +39,7 @@ export default class Game {
 		lastKillTime: number
 		maxCombo: number
 	}
+	isPaused: boolean
 
 	constructor({ scene, opt }: IGameOpt) {
 		this.scene = scene
@@ -63,6 +64,7 @@ export default class Game {
 		this.foods = []
 		this.bugs = []
 		this.timeOvered = false
+		this.isPaused = false
 
 		this.stats = {
 			score: 0,
@@ -82,8 +84,54 @@ export default class Game {
 			)
 		)
 		this.scene.addUpdate('area', () => {
-			this.area.updateUI()
+			if (!this.isPaused) {
+				this.area.updateUI()
+			}
 		})
+	}
+
+	pause() {
+		if (this.isPaused) return
+		this.isPaused = true
+		
+		// Pause all bugs
+		this.bugs.forEach(bug => {
+			bug.pause()
+		})
+
+		// Pause all foods
+		this.foods.forEach(food => {
+			if (food.animationTicker) {
+				food.animationTicker.stop()
+			}
+		})
+
+		// Stop bug spawning
+		if (this.timerIds['bugs']) {
+			clearInterval(this.timerIds['bugs'])
+		}
+	}
+
+	resume() {
+		if (!this.isPaused) return
+		this.isPaused = false
+
+		// Resume all bugs
+		this.bugs.forEach(bug => {
+			bug.resume()
+		})
+
+		// Resume all foods
+		this.foods.forEach(food => {
+			if (food.animationTicker) {
+				food.animationTicker.start()
+			}
+		})
+
+		// Resume bug spawning
+		if (!this.timeOvered) {
+			this.createBugs()
+		}
 	}
 
 	async start(round: number) {
@@ -95,6 +143,7 @@ export default class Game {
 		this.bugs = []
 		this.foods = []
 		this.timeOvered = false
+		this.isPaused = false
 		this.setArea()
 		this.setSwatter()
 		this.createFood(round)
@@ -105,6 +154,7 @@ export default class Game {
 		this.foods.forEach((food) => food.die())
 		this.timeOvered = false
 		this.bugs.forEach((bug) => bug.remove())
+		this.isPaused = false
 	}
 
 	createScorePopup(
@@ -130,12 +180,14 @@ export default class Game {
 
 		const ticker = new Ticker()
 		ticker.add(() => {
-			scoreText.y -= riseSpeed
-			scoreText.alpha -= alphaDecay
+			if (!this.isPaused) {
+				scoreText.y -= riseSpeed
+				scoreText.alpha -= alphaDecay
 
-			if (scoreText.alpha <= 0) {
-				ticker.stop()
-				this.area.grid.removeChild(scoreText)
+				if (scoreText.alpha <= 0) {
+					ticker.stop()
+					this.area.grid.removeChild(scoreText)
+				}
 			}
 		})
 
@@ -174,7 +226,7 @@ export default class Game {
 
 	createBugs() {
 		this.timerIds['bugs'] = setInterval(() => {
-			if (!this.levelOption) return
+			if (!this.levelOption || this.isPaused) return
 			if (this.levelOption?.bugsCount > this.bugs.length) this.createBug()
 		}, 2000)
 	}
@@ -259,14 +311,17 @@ export default class Game {
 		if (!this.levelOption?.area) return
 		const area = AREAS[this.levelOption.area]
 		if (!area) return
-		this.area.setArea({
-			...area,
-			width: this.scene.canvas.width,
-			height: this.scene.canvas.height,
-			texture: this.loadedAssets[this.levelOption.area],
-			areaName: this.levelOption.area,
-			// textureMask: this.loadedAssets[`${this.levelOption.area}-mask`],
-		}, this)
+		this.area.setArea(
+			{
+				...area,
+				width: this.scene.canvas.width,
+				height: this.scene.canvas.height,
+				texture: this.loadedAssets[this.levelOption.area],
+				areaName: this.levelOption.area,
+				// textureMask: this.loadedAssets[`${this.levelOption.area}-mask`],
+			},
+			this
+		)
 	}
 
 	setSwatter() {
@@ -303,7 +358,7 @@ export default class Game {
 			{
 				alias: `${level.area}-animation`,
 				loader: 'loadTextures',
-				src: AREAS[level.area].animationSpritesheet.meta.image,
+				src: AREAS[level.area].animationSpritesheet?.meta.image || '',
 			},
 		]
 
@@ -343,7 +398,7 @@ export default class Game {
 		) {
 			const spritesheet = new Spritesheet(
 				this.loadedAssets[`${level.area}-animation`],
-				AREAS[level.area].animationSpritesheet
+				AREAS[level.area].animationSpritesheet || {}
 			)
 			await spritesheet.parse()
 			spritesheets[`${level.area}-animation`] = spritesheet

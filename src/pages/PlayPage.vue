@@ -37,6 +37,8 @@ onMounted(async () => {
 	audioCont.play('bug-boogie')
 	init()
 
+	document.addEventListener('visibilitychange', handleVisibilityChange)
+
 	try {
 		if (Capacitor.getPlatform() === 'android') {
 			await Admob.showBanner()
@@ -53,7 +55,24 @@ onBeforeUnmount(() => {
 		Admob.removeBanner()
 	}
 	gameController.destroy()
+	document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
+
+function handleVisibilityChange() {
+	if (document.hidden) {
+		audioCont.stop('bug-boogie')
+		if (gameController) {
+			gameController.pause()
+		}
+	} else {
+		if (!roundEnded.value && !isEnd.value) {
+			audioCont.play('bug-boogie')
+			if (gameController) {
+				gameController.resume() 
+			}
+		}
+	}
+}
 
 async function init() {
 	if (canvas.value) {
@@ -72,7 +91,6 @@ async function init() {
 					audioCont.play('win')
 				},
 				endGame() {
-					console.log('endGame')
 					isEnd.value = true
 				},
 				play(name: string) {

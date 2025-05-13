@@ -86,8 +86,8 @@ export class Food extends AnimatedSprite {
 		this.health -= damage
 
 		if (this.health < 0) {
-			this.die()
 			this.game.foodCalculate()
+			this.die()
 			return
 		} else if (this.health < 0.2 * FOODS[this.name].health) {
 			this.currentFrame = 3

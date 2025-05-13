@@ -16,7 +16,7 @@ defineProps<{
 <style lang="scss" scoped>
 .bug-counter {
   position: absolute;
-  bottom: 20px;
+  bottom: 60px;
   left: 20px;
   z-index: 300;
   pointer-events: none;
@@ -53,6 +53,10 @@ defineProps<{
     color: #fff;
     -webkit-text-stroke: 2px black;
     text-stroke: 2px black;
+
+		@media screen and (max-width: 480px) {
+			transform: translateY(3px);
+		}
   }
 }
 </style> 
