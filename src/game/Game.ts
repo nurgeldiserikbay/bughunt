@@ -75,29 +75,12 @@ export default class Game {
 	}
 
 	async init() {
-		this.area.init()
 		this.scene.addElem(this.area.grid)
-		this.area.grid.scale.set(
-			Math.min(
-				this.scene.canvas.clientWidth / this.scene.canvas.width,
-				this.scene.canvas.clientHeight / this.scene.canvas.height
-			)
-		)
-		this.scene.addUpdate('area', () => {
-			if (!this.isPaused) {
-				this.area.updateUI()
-			}
-		})
 	}
 
 	pause() {
 		if (this.isPaused) return
 		this.isPaused = true
-		
-		// Pause all bugs
-		this.bugs.forEach(bug => {
-			bug.pause()
-		})
 
 		// Pause all foods
 		this.foods.forEach(food => {
@@ -115,11 +98,6 @@ export default class Game {
 	resume() {
 		if (!this.isPaused) return
 		this.isPaused = false
-
-		// Resume all bugs
-		this.bugs.forEach(bug => {
-			bug.resume()
-		})
 
 		// Resume all foods
 		this.foods.forEach(food => {
@@ -314,8 +292,8 @@ export default class Game {
 		this.area.setArea(
 			{
 				...area,
-				width: this.scene.canvas.width,
-				height: this.scene.canvas.height,
+				width: this.scene.canvas.clientWidth,
+				height: this.scene.canvas.clientHeight,
 				texture: this.loadedAssets[this.levelOption.area],
 				areaName: this.levelOption.area,
 				// textureMask: this.loadedAssets[`${this.levelOption.area}-mask`],

@@ -70,6 +70,11 @@ export class HealthBar extends Container {
 		this.fg.width = this.blockWidth * ratio
 	}
 
+	updatePosition(x: number, y: number) {
+		this.x = x - this.width / 2
+		this.y = y - this.height / 2 - 25
+	}
+
 	destroy() {
 		this.bg.destroy()
 		this.fg.destroy()

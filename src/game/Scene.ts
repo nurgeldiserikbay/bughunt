@@ -26,7 +26,7 @@ export default class Scene {
 			canvas: this.canvas,
 			width: this.canvas.width,
 			height: this.canvas.height,
-			// resolution: window.devicePixelRatio || 1,
+			resolution: window.devicePixelRatio || 1,
 			autoDensity: true,
 			antialias: true,
 		})
