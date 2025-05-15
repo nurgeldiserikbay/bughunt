@@ -1,14 +1,4 @@
-import {
-	Container,
-	FederatedPointerEvent,
-	Point,
-	Sprite,
-	Ticker,
-	Spritesheet,
-	AnimatedSprite,
-} from 'pixi.js'
-
-import { IPoint } from '../interfaces'
+import { Container, Sprite, Ticker, Spritesheet, AnimatedSprite } from 'pixi.js'
 
 import Scene from '../Scene'
 import { I_AreaOpt, IArea } from '../types'
@@ -51,20 +41,17 @@ export class Area {
 		this.bg.height = option.height
 		this.spritesheets = game.spritesheets[`${option.areaName}-animation`]
 
-		// Stop previous animations if any
 		if (this.animationTicker) {
 			this.animationTicker.destroy()
 			this.animationTicker = null
 		}
 
-		// Remove existing animation elements
 		this.animationElements.forEach((element) => {
 			element.destroy()
 			this.grid.removeChild(element)
 		})
 		this.animationElements = []
 
-		// Start new animation system
 		this.startAnimations()
 	}
 
@@ -73,10 +60,10 @@ export class Area {
 
 		const element = new AnimatedSprite(this.spritesheets.animations.run)
 		const sizeScale = 0.8 + Math.random() * 0.4
-		element.width = this.option.animationWidth * sizeScale // 80-120% of base size
+		element.width = this.option.animationWidth * sizeScale
 		element.height = this.option.animationHeight * sizeScale
 		element.x = Math.random() * this.option.width
-		element.y = -30 // Start above screen
+		element.y = -30
 		element.tint = 0xffffff
 		;(element as any).speed = this.option.animationMoveSpeed || 1
 		element.animationSpeed = this.option.animationSpeed || 0.1
@@ -92,22 +79,19 @@ export class Area {
 
 		this.animationTicker = new Ticker()
 		this.animationTicker.add(() => {
-			// Check if we should spawn a new animation
 			if (this.nextAnimationSpawn <= 0) {
 				if (this.animationElements.length < 5 && Math.random() < 0.3) {
-					// 10% chance to spawn if less than 5 elements
 					const newElement = this.createAnimationElement()
 					if (newElement) {
 						this.grid.addChild(newElement)
 						this.animationElements.push(newElement)
 					}
 				}
-				this.nextAnimationSpawn = 60 + Math.floor(Math.random() * 120) // Wait 1-3 seconds before next spawn check
+				this.nextAnimationSpawn = 60 + Math.floor(Math.random() * 120)
 			} else {
 				this.nextAnimationSpawn--
 			}
 
-			// Update existing animations
 			this.animationElements = this.animationElements.filter((element) => {
 				if ((element as any).waitTime > 0) {
 					;(element as any).waitTime--
@@ -115,19 +99,17 @@ export class Area {
 				}
 
 				element.y += (element as any).speed
-				element.x += Math.sin(element.y / 50) * 0.5 // Smooth wind-like movement
+				element.x += Math.sin(element.y / 50) * 0.5
 
-				// When element goes below screen
 				if (element.y > this.grid.height + 30) {
 					if (Math.random() < 0.3) {
-						// 30% chance to remove element
 						this.grid.removeChild(element)
 						element.destroy()
 						return false
 					} else {
-						element.y = -30 // Reset to top
+						element.y = -30
 						element.x = Math.random() * this.grid.width
-						;(element as any).waitTime = 30 + Math.floor(Math.random() * 90) // Wait 0.5-2 seconds
+						;(element as any).waitTime = 30 + Math.floor(Math.random() * 90)
 					}
 				}
 				return true

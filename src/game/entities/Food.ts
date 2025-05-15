@@ -70,13 +70,10 @@ export class Food extends AnimatedSprite {
 	startBounceAnimation() {
 		this.animationTicker = new Ticker()
 		this.animationTicker.add(() => {
-			// Плавное подпрыгивание с помощью синуса
 			this.y = this.initialY + Math.sin(Date.now() * 0.002) * 3
-			// Плавное сжатие/разжатие
 			const scale = 1 + Math.sin(Date.now() * 0.003) * 0.02
 			this.width = this.initialWidth * scale
 			this.height = this.initialHeight * scale
-			// Обновляем позицию healthBar вместе с едой
 			this.healthBar.y = this.y - this.height / 2 - 20
 		})
 		this.animationTicker.start()

@@ -206,7 +206,7 @@ export const BUGS: IBugs = {
 		appetite: 2,
 		score: 3,
 		eatSpeed: 500,
-		speed: 8,
+		speed: 6,
 		animationSpeed: 0.3,
 		intelligence: 0.7,
 	},
@@ -219,7 +219,7 @@ export const BUGS: IBugs = {
 		appetite: 3,
 		score: 4,
 		eatSpeed: 600,
-		speed: 8,
+		speed: 6,
 		animationSpeed: 0.3,
 		intelligence: 0.65,
 	},
@@ -232,7 +232,7 @@ export const BUGS: IBugs = {
 		appetite: 8,
 		score: 5,
 		eatSpeed: 400,
-		speed: 12,
+		speed: 8,
 		animationSpeed: 0.3,
 		intelligence: 0.8,
 	},
@@ -245,7 +245,7 @@ export const BUGS: IBugs = {
 		appetite: 12,
 		score: 6,
 		eatSpeed: 1600,
-		speed: 3,
+		speed: 4,
 		animationSpeed: 1.8,
 		intelligence: 0.3,
 	},
@@ -258,7 +258,7 @@ export const BUGS: IBugs = {
 		appetite: 15,
 		score: 7,
 		eatSpeed: 1400,
-		speed: 3,
+		speed: 4,
 		animationSpeed: 1.8,
 		intelligence: 0.25,
 	},
@@ -271,7 +271,7 @@ export const BUGS: IBugs = {
 		appetite: 13,
 		score: 6,
 		eatSpeed: 1500,
-		speed: 3,
+		speed: 4,
 		animationSpeed: 1.8,
 		intelligence: 0.35,
 	},
@@ -311,7 +311,7 @@ export const FLY_SWATTER: ISwatters = {
 export const LEVEL: ILevels = {
 	1: {
 		area: 'garden1',
-		bugsCount: 6,
+		bugsCount: 8,
 		swatter: 'purple',
 		bugs: {
 			40: 'beetle_yellow',
@@ -322,7 +322,7 @@ export const LEVEL: ILevels = {
 	},
 	2: {
 		area: 'garden1',
-		bugsCount: 8,
+		bugsCount: 10,
 		swatter: 'purple',
 		bugs: {
 			30: 'beetle_yellow',
@@ -333,7 +333,7 @@ export const LEVEL: ILevels = {
 	},
 	3: {
 		area: 'garden1',
-		bugsCount: 10,
+		bugsCount: 12,
 		swatter: 'purple',
 		bugs: {
 			20: 'beetle_yellow',
@@ -345,7 +345,7 @@ export const LEVEL: ILevels = {
 	},
 	4: {
 		area: 'garden2',
-		bugsCount: 12,
+		bugsCount: 14,
 		swatter: 'purple',
 		bugs: {
 			15: 'beetle_yellow',
@@ -372,7 +372,7 @@ export const LEVEL: ILevels = {
 	},
 	6: {
 		area: 'garden2',
-		bugsCount: 16,
+		bugsCount: 14,
 		swatter: 'purple',
 		bugs: {
 			8: 'beetle_yellow',
@@ -387,7 +387,7 @@ export const LEVEL: ILevels = {
 	},
 	7: {
 		area: 'garden3',
-		bugsCount: 18,
+		bugsCount: 14,
 		swatter: 'purple',
 		bugs: {
 			7: 'beetle_yellow',
@@ -403,7 +403,7 @@ export const LEVEL: ILevels = {
 	},
 	8: {
 		area: 'garden3',
-		bugsCount: 18,
+		bugsCount: 16,
 		swatter: 'purple',
 		bugs: {
 			6: 'beetle_yellow',
@@ -437,7 +437,7 @@ export const LEVEL: ILevels = {
 	},
 	10: {
 		area: 'garden4',
-		bugsCount: 18,
+		bugsCount: 20,
 		swatter: 'purple',
 		bugs: {
 			4: 'beetle_yellow',
@@ -454,7 +454,7 @@ export const LEVEL: ILevels = {
 	},
 	11: {
 		area: 'garden4',
-		bugsCount: 22,
+		bugsCount: 20,
 		swatter: 'purple',
 		bugs: {
 			3: 'beetle_yellow',
@@ -471,7 +471,7 @@ export const LEVEL: ILevels = {
 	},
 	12: {
 		area: 'garden4',
-		bugsCount: 25,
+		bugsCount: 20,
 		swatter: 'purple',
 		bugs: {
 			2: 'beetle_yellow',
@@ -488,7 +488,7 @@ export const LEVEL: ILevels = {
 	},
 	13: {
 		area: 'garden5',
-		bugsCount: 30,
+		bugsCount: 20,
 		swatter: 'purple',
 		bugs: {
 			2: 'beetle_yellow',
@@ -505,7 +505,7 @@ export const LEVEL: ILevels = {
 	},
 	14: {
 		area: 'garden5',
-		bugsCount: 40,
+		bugsCount: 20,
 		swatter: 'purple',
 		bugs: {
 			1: 'beetle_yellow',

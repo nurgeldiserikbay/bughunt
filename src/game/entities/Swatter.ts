@@ -64,7 +64,9 @@ export class FlySwatter extends AnimatedSprite {
 				bug.hit((power * Math.max(0, SIZE - dist)) / SIZE)
 			}
 		})
+
 		drawWave(this.game.area.grid, hitX, hitY)
+
 		this.game.controls.play(
 			AUDIO_LIST[Math.floor(AUDIO_LIST.length * Math.random())]
 		)
