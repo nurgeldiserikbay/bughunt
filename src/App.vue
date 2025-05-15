@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { onMounted } from 'vue'
+import { App } from '@capacitor/app'
 import { Capacitor } from '@capacitor/core'
 import { StatusBar } from '@capacitor/status-bar'
 import { SplashScreen } from '@capacitor/splash-screen'
@@ -23,6 +24,10 @@ onMounted(async () => {
 		await StatusBar.hide()
 		await StatusBar.setOverlaysWebView({ overlay: true })
 		await SplashScreen.hide()
+
+		App.addListener('backButton', () => {
+			App.exitApp()
+		})
 	}
 
 	await gameStore.loadData()

@@ -82,8 +82,12 @@ export default class Game {
 		if (this.isPaused) return
 		this.isPaused = true
 
+		this.bugs.forEach((bug) => {
+			bug.pause()
+		})
+
 		// Pause all foods
-		this.foods.forEach(food => {
+		this.foods.forEach((food) => {
 			if (food.animationTicker) {
 				food.animationTicker.stop()
 			}
@@ -99,8 +103,12 @@ export default class Game {
 		if (!this.isPaused) return
 		this.isPaused = false
 
+		this.bugs.forEach((bug) => {
+			bug.resume()
+		})
+
 		// Resume all foods
-		this.foods.forEach(food => {
+		this.foods.forEach((food) => {
 			if (food.animationTicker) {
 				food.animationTicker.start()
 			}

@@ -310,4 +310,13 @@ export class Bug extends Container {
 			clearTimeout(this.timers[timer])
 		}
 	}
+
+	pause() {
+		this.sprite.stop()
+		this.stopEating()
+	}
+
+	resume() {
+		this.sprite.play()
+	}
 }

@@ -23,12 +23,22 @@ const {
 const pageStore = usePageStore()
 
 onMounted(() => {
+	document.addEventListener('visibilitychange', handleVisibilityChange)
 	play('bug-boogie')
 })
 
 onBeforeUnmount(() => {
+	document.removeEventListener('visibilitychange', handleVisibilityChange)
 	stop('bug-boogie')
 })
+
+function handleVisibilityChange() {
+	if (document.hidden) {
+		stop('bug-boogie')
+	} else {
+		play('bug-boogie')
+	}
+}
 </script>
 
 <template>
