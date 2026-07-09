@@ -241,7 +241,7 @@ export default class Game {
 	}
 
 	filterBugs() {
-		if (this.timerIds['bugsDied']) clearInterval(this.timerIds['bugsDied'])
+		if (this.timerIds['bugsDied']) clearTimeout(this.timerIds['bugsDied'])
 		this.timerIds['bugsDied'] = setTimeout(() => {
 			const died = this.bugs.filter((b) => b.state === 'dead')
 			let extraScore = 0

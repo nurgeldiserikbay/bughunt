@@ -19,7 +19,6 @@ const pageStore = usePageStore()
 const adsStore = useAdsStore()
 const audioCont = useAudio()
 
-let timers: { [key: number]: ReturnType<typeof setTimeout> } = {}
 const score = ref<{ [key: string]: number }>({
 	bugs: 0,
 	foodHealth: 0,
@@ -50,7 +49,6 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
 	audioCont.stop('bug-boogie')
-	clearTimers()
 	if (Capacitor.getPlatform() === 'android') {
 		Admob.removeBanner()
 	}
@@ -60,7 +58,8 @@ onBeforeUnmount(() => {
 
 function handleVisibilityChange() {
 	if (document.hidden) {
-		audioCont.stop('bug-boogie')
+		if (roundEnded.value) audioCont.stop('win')
+		else audioCont.stop('bug-boogie')
 		if (gameController) {
 			gameController.pause()
 		}
@@ -68,7 +67,7 @@ function handleVisibilityChange() {
 		if (!roundEnded.value && !isEnd.value) {
 			audioCont.play('bug-boogie')
 			if (gameController) {
-				gameController.resume() 
+				gameController.resume()
 			}
 		}
 	}
@@ -130,13 +129,7 @@ async function nextLevel() {
 }
 
 function timeend() {
-	audioCont.playAudio('timeend')
-
 	gameController._game.timeOver()
-}
-
-function clearTimers() {
-	Object.values(timers).forEach((id) => clearTimeout(id))
 }
 </script>
 

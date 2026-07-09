@@ -109,25 +109,25 @@ export const FOODS: IFoods = {
 		texture: '/img/foods/banana.png',
 		data: banana,
 		health: 180,
-		attractiveness: 1,
+		attractiveness: 1.2,
 	},
 	cookie: {
 		texture: '/img/foods/cookie.png',
 		data: cookie,
 		health: 150,
-		attractiveness: 1,
+		attractiveness: 1.5,
 	},
 	grape: {
 		texture: '/img/foods/grape.png',
 		data: grape,
 		health: 220,
-		attractiveness: 1,
+		attractiveness: 1.3,
 	},
 	orange: {
 		texture: '/img/foods/orange.png',
 		data: orange,
 		health: 190,
-		attractiveness: 1,
+		attractiveness: 1.1,
 	},
 }
 
@@ -187,7 +187,7 @@ export const BUGS: IBugs = {
 	beetle_yellow: {
 		width: 50,
 		height: 50,
-		dieSound: 'beetle_yellow',
+		dieSound: 'dieBeetle',
 		data: beetle_yellow,
 		health: 55,
 		appetite: 3,

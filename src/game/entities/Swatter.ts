@@ -15,6 +15,7 @@ export class FlySwatter extends AnimatedSprite {
 	cooldown?: number
 	timer?: ReturnType<typeof setTimeout>
 	spritesheets: Spritesheet
+	boundStartHit: (event: FederatedPointerEvent) => void
 
 	constructor(optName: string, game: Game) {
 		super(game.spritesheets[optName].animations.bit)
@@ -23,7 +24,7 @@ export class FlySwatter extends AnimatedSprite {
 		this.zIndex = 10
 		this.game = game
 		this.spritesheets = game.spritesheets[optName]
-		this.animationSpeed = 0.5
+		this.animationSpeed = 1.5
 		this.loop = false
 
 		const opt = FLY_SWATTER[optName]
@@ -34,7 +35,8 @@ export class FlySwatter extends AnimatedSprite {
 		this.visible = false
 
 		game.area.addChild(this)
-		this.game.area.grid.on('pointerdown', this.startHit.bind(this))
+		this.boundStartHit = this.startHit.bind(this)
+		this.game.area.grid.on('pointerdown', this.boundStartHit)
 
 		this.onComplete = this.completeFunc
 	}
@@ -73,11 +75,12 @@ export class FlySwatter extends AnimatedSprite {
 		this.stop()
 		this.timer = setTimeout(() => {
 			this.visible = false
-		}, Number(this.cooldown) * 20)
+		}, Number(this.cooldown) * 40)
 	}
 
 	dispose() {
+		if (this.timer) clearTimeout(this.timer)
 		this.game.area.removeChild(this)
-		this.game.area.grid.off('pointerdown', this.startHit.bind(this))
+		this.game.area.grid.off('pointerdown', this.boundStartHit)
 	}
 }

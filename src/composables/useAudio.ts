@@ -45,7 +45,7 @@ export const useAudio = () => {
 			})
 		}
 
-		playAudio('break')
+		playAudio('click')
 	}
 
 	function play(name: string) {
