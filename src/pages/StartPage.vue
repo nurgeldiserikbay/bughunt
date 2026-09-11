@@ -5,6 +5,7 @@ import IconPublicRelation from '@/assets/img/public-relation.svg'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
 import OtherGames from '@/components/OtherGames.vue'
+import OtherGamesIcon from '@/components/OtherGamesIcon.vue'
 
 import { usePageStore } from '@/store/pageStore'
 
@@ -71,14 +72,17 @@ function handleVisibilityChange() {
 			>
 				<IconMusicalNote />
 			</button>
+			<!-- Вход в «Другие игры». Третьим в этом же ряду и с той же
+			     приглушённостью, что у выключенных кнопок: раздел не должен
+			     спорить за внимание с кнопкой Play. -->
+			<button
+				class="start-page__games"
+				aria-label="Other games"
+				@click="playAudio('click'), (isOtherGames = true)"
+			>
+				<OtherGamesIcon />
+			</button>
 		</div>
-
-		<button
-			class="start-page__more"
-			@click="playAudio('click'), (isOtherGames = true)"
-		>
-			Other games
-		</button>
 
 		<a
 			href="https://docs.google.com/document/d/1Jmi550uXZppjdmS3TmSRZ36L2V0MaWzjP097IwNXDHI/edit?usp=sharing"
@@ -123,23 +127,10 @@ function handleVisibilityChange() {
 		}
 	}
 
-	&__more {
-		padding: 10px 20px;
-		border: none;
-		border-radius: 13px;
-		background: linear-gradient(180deg, #9280f7, #6246d6);
-		box-shadow: 0 3px 0 #3f2ba0;
-		cursor: pointer;
-		font-size: 13px;
-		font-weight: 900;
-		letter-spacing: 0.8px;
-		text-transform: uppercase;
+	/* Значок берёт форму от общего правила ряда (&__btns button) — здесь только
+	   цвет линии: сам значок рисуется currentColor. */
+	&__games {
 		color: #fff;
-
-		&:active {
-			transform: translateY(2px);
-			box-shadow: 0 1px 0 #3f2ba0;
-		}
 	}
 
 	&__btns {
