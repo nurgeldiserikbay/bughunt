@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { Capacitor } from '@capacitor/core'
 
 import UiButton from '@/components/UiButton.vue'
@@ -7,16 +7,16 @@ import BackLink from '@/components/BackLink.vue'
 import TimerItem from '@/components/TimerItem.vue'
 import ResultTable from '@/components/ResultTable.vue'
 import BugCounter from '@/components/BugCounter.vue'
+import AdSlot from '@/components/AdSlot.vue'
+import OtherGames from '@/components/OtherGames.vue'
 
 import { usePageStore } from '@/store/pageStore'
-import { useAdsStore } from '@/store/adsStore'
 
 import Admob from '@/utils/admob'
 import { useAudio } from '@/composables/useAudio'
 import GameController from '@/game/GameController'
 
 const pageStore = usePageStore()
-const adsStore = useAdsStore()
 const audioCont = useAudio()
 
 const score = ref<{ [key: string]: number }>({
@@ -28,6 +28,17 @@ const level = ref(0)
 const levelView = ref(false)
 const roundEnded = ref(false)
 const isEnd = ref(false)
+
+const isOtherGames = ref(false)
+
+/**
+ * Можно ли открыть список игр касанием рекламной полосы.
+ *
+ * Только когда партия не идёт: полоса стоит вплотную к игровому полю, и
+ * касание во время раунда не должно стоить игроку партии. Пока раунд идёт,
+ * полоса — просто картинка.
+ */
+const canOpenPromo = computed(() => roundEnded.value || isEnd.value)
 
 let gameController: GameController
 const canvas = ref<HTMLCanvasElement>()
@@ -88,6 +99,14 @@ async function init() {
 					roundEnded.value = true
 					audioCont.stop('bug-boogie')
 					audioCont.play('win')
+
+					// Уровень пройден, экран итога уже показан — естественная пауза.
+					// Раньше показ висел на кнопке «дальше»: объявление выходило в момент
+					// начала следующего уровня, а сам уровень ждал его закрытия.
+					// Частоту ограничивает сам рекламный модуль.
+					if (Capacitor.getPlatform() === 'android') {
+						void Admob.interstitial()
+					}
 				},
 				endGame() {
 					isEnd.value = true
@@ -111,19 +130,8 @@ async function startLevel() {
 }
 
 async function nextLevel() {
-	if (Capacitor.getPlatform() === 'android') {
-		if (adsStore.loading) return
-		adsStore.toggleLoading(true)
-		await new Promise((res) => {
-			Admob.interstitial({
-				isFirst: false,
-				onInterstitialAdClosed: () => {
-					res(true)
-				},
-			})
-		})
-		adsStore.toggleLoading(false)
-	}
+	// Никакой рекламы на этом пути: переход на следующий уровень запускает игрок.
+	// Показ перенесён на завершение уровня (см. opt.roundEnd).
 	level.value += 1
 	startLevel()
 }
@@ -179,6 +187,16 @@ function timeend() {
 			:result="score"
 			@close="audioCont.playAudio('click'), pageStore.toBackLink()"
 		/>
+
+		<AdSlot
+			:interactive="canOpenPromo"
+			@open="audioCont.playAudio('click'), (isOtherGames = true)"
+		/>
+
+		<OtherGames
+			v-if="isOtherGames"
+			@close="audioCont.playAudio('click'), (isOtherGames = false)"
+		/>
 	</div>
 </template>
 
@@ -187,7 +205,10 @@ function timeend() {
 	display: flex;
 	flex-direction: column;
 	align-items: stretch;
-	padding: 0px;
+	/* Низ отдан рекламной зоне: в ней либо баннер, либо кросс-промо, но пустой
+	   она не бывает. Поле игры считает свой размер от этой высоты (Scene.init
+	   читает clientHeight), поэтому объявление не накрывает игровое поле. */
+	padding: 0 0 var(--ad-band);
 	position: relative;
 
 	&__back {

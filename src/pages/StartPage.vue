@@ -2,7 +2,9 @@
 import IconMusicalNote from '@/assets/img/musical-note.svg'
 import IconPublicRelation from '@/assets/img/public-relation.svg'
 
-import { onBeforeUnmount, onMounted } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
+
+import OtherGames from '@/components/OtherGames.vue'
 
 import { usePageStore } from '@/store/pageStore'
 
@@ -21,6 +23,8 @@ const {
 } = useAudio()
 
 const pageStore = usePageStore()
+
+const isOtherGames = ref(false)
 
 onMounted(() => {
 	document.addEventListener('visibilitychange', handleVisibilityChange)
@@ -69,12 +73,24 @@ function handleVisibilityChange() {
 			</button>
 		</div>
 
+		<button
+			class="start-page__more"
+			@click="playAudio('click'), (isOtherGames = true)"
+		>
+			Other games
+		</button>
+
 		<a
 			href="https://docs.google.com/document/d/1Jmi550uXZppjdmS3TmSRZ36L2V0MaWzjP097IwNXDHI/edit?usp=sharing"
 			target="_blank"
 			class="privacy"
 			>Privacy Policy</a
 		>
+
+		<OtherGames
+			v-if="isOtherGames"
+			@close="playAudio('click'), (isOtherGames = false)"
+		/>
 	</div>
 </template>
 
@@ -104,6 +120,25 @@ function handleVisibilityChange() {
 		img {
 			display: block;
 			width: 100%;
+		}
+	}
+
+	&__more {
+		padding: 10px 20px;
+		border: none;
+		border-radius: 13px;
+		background: linear-gradient(180deg, #9280f7, #6246d6);
+		box-shadow: 0 3px 0 #3f2ba0;
+		cursor: pointer;
+		font-size: 13px;
+		font-weight: 900;
+		letter-spacing: 0.8px;
+		text-transform: uppercase;
+		color: #fff;
+
+		&:active {
+			transform: translateY(2px);
+			box-shadow: 0 1px 0 #3f2ba0;
 		}
 	}
 

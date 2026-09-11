@@ -8,15 +8,21 @@ import { Fullscreen } from '@boengli/capacitor-fullscreen'
 
 import Admob from '@/utils/admob'
 
+import { useAdsStore } from '@/store/adsStore'
 import { usePageStore } from '@/store/pageStore'
 import { useGameStore } from '@/store/gameStore'
 
+const adsStore = useAdsStore()
 const pageStore = usePageStore()
 const gameStore = useGameStore()
 
 onMounted(async () => {
+	// Подписку ставим до initialize(): первое событие баннера может прийти
+	// раньше, чем страница успеет смонтироваться, и потеряться.
+	Admob.onBannerChange((live, height) => adsStore.setBanner(live, height))
+
 	if (Capacitor.getPlatform() === 'android') {
-		Admob.initialize()
+		void Admob.initialize().catch(() => {})
 	}
 
 	if (Capacitor.getPlatform() === 'android') {
